@@ -4,24 +4,24 @@ mod db;
 mod ledger;
 mod manuscript;
 mod mapping;
-mod service;
 mod pipeline;
+mod service;
 mod twin;
 
 use logline_common::{
     config::Config,
-    triage::{make_plan_from_json, ExecutionPlan, AnalysisStage},
+    triage::{make_plan_from_json, AnalysisStage, ExecutionPlan},
     Error, Result,
 };
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::{self, File};
+use std::io::{BufRead, BufReader};
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant, SystemTime};
 
-use anyhow::Result as AnyhowResult;
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use clap::{Parser, Subcommand};
 use commands::{run_causal_analysis, sync_ledger};
 use config::RunnerConfig;
@@ -38,7 +38,7 @@ use ledger::append_span;
 use mapping::classify_span;
 use serde_json::{json, Value};
 use span_ingestor::{ingest_fold_json, ingest_json, IngestOptions};
-use spans_core::UniversalSpan;
+use spans_core::{span_from_json, UniversalSpan};
 use sqlx::postgres::PgPool;
 use tokio::time::{sleep, Duration};
 use tracing::{info, warn};
@@ -150,6 +150,8 @@ enum Command {
         #[arg(long, default_value_t = 100)]
         limit: usize,
     },
+}
+
 enum LedgerCommand {
     /// Count entries in the ledger
     Status,
@@ -511,10 +513,22 @@ async fn handle_diagnose(cfg: &RunnerConfig) -> Result<()> {
     ] {
         if PathBuf::from(script).exists() {
             println!("✓ Found {script}");
+        } else {
+            println!("✗ Missing {script}");
+        }
+    }
+
+    Ok(())
+}
+
+async fn handle_quickstart(output: PathBuf, cfg: &RunnerConfig) -> Result<()> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let samples_dir = manifest_dir.join("../../samples/spans");
     if !samples_dir.exists() {
-        anyhow::bail!("Samples directory missing: {}", samples_dir.display());
+        return Err(Error::Validation(format!(
+            "Samples directory missing: {}",
+            samples_dir.display()
+        )));
     }
 
     println!(
@@ -544,30 +558,43 @@ async fn handle_diagnose(cfg: &RunnerConfig) -> Result<()> {
         println!("✓ Ingested {}", file);
     }
 
-    println!("Generating manuscript bundle at {}", output.display());
-        }
-        info!(span = %extra.id.0, "twin_divergence_persisted");
+    if let Some(parent) = output.parent() {
+        fs::create_dir_all(parent)?;
     }
 
-    Ok(span.id.0.clone())
+    println!("Generating manuscript bundle at {}", output.display());
+    manuscript::run(None, output.clone(), cfg).await?;
+    println!("✓ Manuscript bundle generated at {}", output.display());
+
+    Ok(())
 }
 
 async fn handle_process_recent(
     since: Option<String>,
     limit: usize,
-{{ ... }}
+    cfg: &RunnerConfig,
+) -> Result<()> {
+    if limit == 0 {
+        println!("No spans processed (limit = 0)");
+        return Ok(());
+    }
 
-    println!("Processed {} spans, skipped {} (already processed)", processed, skipped);
-    Ok(())
-}
+    let since_filter = if let Some(since) = since {
+        Some(
+            since
+                .parse::<DateTime<Utc>>()
+                .map_err(|err| Error::Validation(format!("Invalid --since timestamp: {err}")))?,
+        )
+    } else {
+        None
+    };
 
-fn is_supported_file(path: &Path) -> bool {
-    let extension = path.extension().and_then(|e| e.to_str());
-    match extension {
-        Some("json") => true,
-        _ => false,
-    let mut engine = build_demo_engine();
-    let report = engine.execute_contract(&contract);
+    if !cfg.ledger_path.exists() {
+        return Err(Error::Validation(format!(
+            "Ledger path missing: {}",
+            cfg.ledger_path.display()
+        )));
+    }
 
     let pool = if let Some(db_url) = &cfg.database_url {
         Some(Arc::new(init_pool(db_url).await?))
@@ -575,41 +602,78 @@ fn is_supported_file(path: &Path) -> bool {
         None
     };
 
-    if let Some(parent) = output.parent() {
-        std::fs::create_dir_all(parent)?;
+    let file = File::open(&cfg.ledger_path)?;
+    let reader = BufReader::new(file);
+    let mut entries = Vec::new();
+    for line in reader.lines() {
+        let line = line?;
+        if line.trim().is_empty() {
+            continue;
+        }
+        match serde_json::from_str::<Value>(&line) {
+            Ok(value) => entries.push(value),
+            Err(err) => {
+                warn!(error = %err, "ledger_line_parse_failed");
+            }
+        }
     }
 
-    let json_report = json!({
-        "contract_path": contract_path,
-        "applied_rotations": report.applied_rotations.len(),
-        "ghost_rotations": report.ghost_rotations.len(),
-        "rejections": report
-            .rejections
-            .iter()
-            .map(|r| format!("{:?}", r))
-            .collect::<Vec<_>>(),
-        "final_energy": {
-            "potential": report.final_energy.total_potential,
-            "kinetic": report.final_energy.total_kinetic,
-        },
-        "trajectory": report
-            .trajectory
-            .spans()
-            .iter()
-            .map(|span| json!({
-                "span_id": span.id.as_str(),
-                "delta_entropy": span.delta_entropy,
-                "delta_information": span.delta_information,
-                "delta_theta": span.delta_theta,
-                "duration_ms": span.duration.as_millis(),
-            }))
-            .collect::<Vec<_>>(),
-    });
+    let mut processed = 0usize;
+    let mut duplicates = 0usize;
+    let mut seen = HashSet::new();
 
-    std::fs::write(&output, serde_json::to_string_pretty(&json_report)?)?;
-    persist_folding_report(&report, &contract_path, &output, cfg, pool.clone()).await?;
-    println!("Folding report written to {}", output.display());
+    for entry in entries.into_iter().rev() {
+        if processed >= limit {
+            break;
+        }
+
+        let span_json = match entry.get("type").and_then(|v| v.as_str()) {
+            Some("span") => entry.get("span").cloned(),
+            Some(_) => None,
+            None => Some(entry.clone()),
+        };
+
+        let Some(span_json) = span_json else {
+            continue;
+        };
+
+        let span = match span_from_json(span_json) {
+            Ok(span) => span,
+            Err(err) => {
+                warn!(error = %err, "ledger_span_parse_failed");
+                continue;
+            }
+        };
+
+        if let Some(threshold) = since_filter {
+            if span.started_at < threshold {
+                continue;
+            }
+        }
+
+        if !seen.insert(span.id.0.clone()) {
+            duplicates += 1;
+            continue;
+        }
+
+        process_span(span, cfg, pool.clone()).await?;
+        processed += 1;
+    }
+
+    println!(
+        "Processed {} spans, skipped {} (already processed)",
+        processed, duplicates
+    );
+
     Ok(())
+}
+
+fn is_supported_file(path: &Path) -> bool {
+    match path.extension().and_then(|ext| ext.to_str()) {
+        Some(ext) if ext.eq_ignore_ascii_case("json") => true,
+        Some(ext) if ext.eq_ignore_ascii_case("ndjson") => true,
+        _ => false,
+    }
 }
 
 async fn handle_ledger_command(command: LedgerCommand, cfg: &RunnerConfig) -> Result<()> {
@@ -837,12 +901,10 @@ async fn process_span(
         } else {
             warn!(span = %extra.id.0, "DATABASE_URL not set; skipping Postgres mirror");
         }
-        println!("Processed {} spans, skipped {} (already processed)", processed, skipped);
-    Ok(())
-}
+        info!(span = %extra.id.0, "twin_divergence_persisted");
+    }
 
-fn is_supported_file(path: &Path) -> bool {
-    matches!(path.extension().and_then(|ext| ext.to_str()).map(|s| s.to_lowercase()), Some(ext) if ext == "json")
+    Ok(span.id.0.clone())
 }
 
 async fn emit_cycle_metrics(
