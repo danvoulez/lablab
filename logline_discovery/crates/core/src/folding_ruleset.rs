@@ -296,10 +296,10 @@ fn distance(left: [f64; 3], right: [f64; 3]) -> f64 {
         .sqrt()
 }
 
-fn find_residue<'a>(
-    chain: &'a PeptideChain,
+fn find_residue(
+    chain: &PeptideChain,
     id: ResidueId,
-) -> Option<&'a folding_molecule::Residue> {
+) -> Option<&folding_molecule::Residue> {
     chain.residues().iter().find(|residue| residue.id == id)
 }
 

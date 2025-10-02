@@ -94,7 +94,7 @@ impl IntelligentRAGSelector {
         };
 
         let response = client.client
-            .post(&format!("{}/api/generate", client.base_url))
+            .post(format!("{}/api/generate", client.base_url))
             .json(&request)
             .send()
             .await?;

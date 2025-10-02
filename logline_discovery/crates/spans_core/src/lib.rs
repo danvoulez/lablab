@@ -13,19 +13,12 @@ impl SpanId {
 
 /// Minimal causal metadata shared across engines.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Default)]
 pub struct CausalLinks {
     pub parent_id: Option<SpanId>,
     pub related_ids: Vec<SpanId>,
 }
 
-impl Default for CausalLinks {
-    fn default() -> Self {
-        Self {
-            parent_id: None,
-            related_ids: Vec::new(),
-        }
-    }
-}
 
 /// Universal span payload flowing between Warp, Fold, and the Discovery Lab.
 #[derive(Debug, Clone, Serialize, Deserialize)]

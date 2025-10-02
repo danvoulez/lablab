@@ -164,6 +164,12 @@ pub struct PhysicsSpanRecord {
     pub metrics: PhysicsSpanMetrics,
 }
 
+impl Default for FoldingEngineBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FoldingEngineBuilder {
     pub fn new() -> Self {
         Self {

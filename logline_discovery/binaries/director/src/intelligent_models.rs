@@ -24,6 +24,12 @@ pub enum ModelSpecialization {
     General,        // General purpose
 }
 
+impl Default for IntelligentModelSelector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl IntelligentModelSelector {
     pub fn new() -> Self {
         let available_models = vec![

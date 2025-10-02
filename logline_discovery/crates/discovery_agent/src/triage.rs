@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use spans_core::UniversalSpan;
 use std::collections::HashMap;
 
@@ -62,6 +61,12 @@ pub struct AnalysisCost {
     pub cpu_time_seconds: u64,
     pub memory_mb: u64,
     pub storage_mb: u64,
+}
+
+impl Default for AnalysisTriage {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl AnalysisTriage {

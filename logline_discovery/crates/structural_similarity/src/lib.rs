@@ -15,6 +15,12 @@ pub struct SimilarityScores {
     pub stgnn: Option<f64>,
 }
 
+impl Default for SimilarityScores {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimilarityScores {
     pub fn new() -> Self {
         Self {

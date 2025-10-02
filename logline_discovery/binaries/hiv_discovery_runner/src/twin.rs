@@ -52,7 +52,7 @@ impl TwinCoordinator {
         let entry = self
             .pending
             .entry(cycle_id.clone())
-            .or_insert_with(PendingObservation::default);
+            .or_default();
 
         match observation.side {
             TwinSide::Physical => {

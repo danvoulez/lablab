@@ -2,7 +2,6 @@
 
 use crate::Contract;
 use chrono::Utc;
-use uuid::Uuid;
 
 pub fn record_span(event: &str, contract: &Contract) {
     println!(

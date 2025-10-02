@@ -1,6 +1,6 @@
 //! Main Director agent implementation
 
-use crate::contracts::{Contract, Flow};
+use crate::contracts::Flow;
 use crate::parser::Intent;
 use crate::policy::Policy;
 use crate::tools::*;

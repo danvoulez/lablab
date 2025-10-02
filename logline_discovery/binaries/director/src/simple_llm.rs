@@ -1,6 +1,6 @@
 //! Simple Ollama integration for LogLine Director with unified personality
 
-use super::personality::{DirectorPersonality, LLMParameters};
+use super::personality::DirectorPersonality;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info, warn};
@@ -51,7 +51,7 @@ impl SimpleOllamaClient {
     
     pub async fn is_available(&self) -> bool {
         match self.client
-            .get(&format!("{}/api/tags", self.base_url))
+            .get(format!("{}/api/tags", self.base_url))
             .send()
             .await
         {
@@ -79,7 +79,7 @@ impl SimpleOllamaClient {
         };
 
         let response = self.client
-            .post(&format!("{}/api/generate", self.base_url))
+            .post(format!("{}/api/generate", self.base_url))
             .json(&request)
             .send()
             .await?;

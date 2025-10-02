@@ -174,12 +174,12 @@ fn pick_series(payload: &Value, paths: &[&str]) -> Vec<f64> {
     Vec::new()
 }
 
-fn resolve_array<'a>(payload: &'a Value, path: &str) -> Option<Vec<Value>> {
+fn resolve_array(payload: &Value, path: &str) -> Option<Vec<Value>> {
     let mut current = payload;
     for key in path.split('.') {
         current = current.get(key)?;
     }
-    current.as_array().map(|arr| arr.clone())
+    current.as_array().cloned()
 }
 
 fn pick_scalar(payload: &Value, paths: &[&str]) -> Option<f64> {

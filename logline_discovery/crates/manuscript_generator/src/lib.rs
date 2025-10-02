@@ -1,5 +1,4 @@
 use chrono::{DateTime, Utc};
-use md5;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -424,7 +423,7 @@ pub fn render_markdown_from(manuscript: &EnhancedManuscript) -> String {
             if let Some(doi) = &citation.doi {
                 output.push_str(&format!(" doi:{}", doi));
             }
-            output.push_str("\n");
+            output.push('\n');
         }
     }
 

@@ -3,7 +3,7 @@
 //! Unified agent for laboratory operations and user interaction
 
 use clap::{Parser, Subcommand};
-use director::{Intent, Contract, Workflow, Flow, Policy};
+use director::{Intent, Contract, Workflow, Flow};
 use std::io::{self, Write};
 use tracing::{info, warn, error};
 

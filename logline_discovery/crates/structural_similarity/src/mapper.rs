@@ -81,7 +81,7 @@ fn compare_profiles(a: &[f64], b: &[f64]) -> f64 {
     (distribution_score * (1.0 - magnitude_penalty)).clamp(0.0, 1.0)
 }
 
-fn resolve_array<'a>(root: &'a Value, path: &str) -> Option<Vec<Value>> {
+fn resolve_array(root: &Value, path: &str) -> Option<Vec<Value>> {
     let mut current = root;
     for key in path.split('.') {
         current = current.get(key)?;

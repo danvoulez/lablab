@@ -2,8 +2,7 @@
 
 use async_trait::async_trait;
 use serde_json::Value;
-use crate::{Contract, Flow};
-use logline_common::{Error, Result};
+use crate::Contract;
 
 pub struct ToolResult {
     pub ok: bool,

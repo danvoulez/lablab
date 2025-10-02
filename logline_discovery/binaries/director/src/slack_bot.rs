@@ -265,7 +265,7 @@ async fn process_slack_message(
             format!("🎯 **Job Submetido**\n\n*Confiança: {:.0}%*\n\n{}\n\n📝 Job ID: `job-{}`", 
                 classification.confidence * 100.0, 
                 classification.reasoning,
-                uuid::Uuid::new_v4().to_string()[..8].to_string())
+                &uuid::Uuid::new_v4().to_string()[..8])
         }
         _ => {
             format!("🤖 **Director Resposta**\n\n*Classificação: {} (Confiança: {:.0}%)*\n\n{}", 

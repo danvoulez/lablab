@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
-use crate::{Error, Result};
+use crate::Result;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TriageEngine {
@@ -65,6 +65,12 @@ pub struct ExecutionPlan {
     pub metadata: HashMap<String, Value>,
 }
 
+impl Default for TriageEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TriageEngine {
     pub fn new() -> Self {
         Self {
@@ -82,14 +88,14 @@ impl TriageEngine {
         Self::load_rules_from_string(&content)
     }
 
-    pub fn load_rules_from_string(content: &str) -> Result<Self> {
+    pub fn load_rules_from_string(_content: &str) -> Result<Self> {
         // For now, return default rules since we don't have toml parsing
         Ok(create_default_rules())
     }
 
     pub fn make_plan(&self, manifest: &Manifest) -> Result<ExecutionPlan> {
         let mut stages = HashSet::new();
-        let mut metadata = HashMap::new();
+        let metadata = HashMap::new();
 
         for rule in &self.rules {
             if rule.matches(manifest)? {
@@ -151,7 +157,7 @@ impl TriageRule {
         for (key, expected) in &self.when {
             let actual = self.get_manifest_value(manifest, key)?;
 
-            if !self.compare_values(&expected, &actual)? {
+            if !self.compare_values(expected, &actual)? {
                 return Ok(false);
             }
         }

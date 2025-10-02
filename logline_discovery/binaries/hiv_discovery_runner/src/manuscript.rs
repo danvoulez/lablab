@@ -97,8 +97,8 @@ pub async fn run(
 
     persist_manuscript(
         &manuscript,
-        markdown_path.as_ref().map(|p| p.as_path()),
-        json_path.as_ref().map(|p| p.as_path()),
+        markdown_path.as_deref(),
+        json_path.as_deref(),
         &ctx,
         cfg,
         &pool,
@@ -250,6 +250,7 @@ struct ProtocolRow {
 }
 
 #[derive(Clone, Debug, FromRow)]
+#[allow(dead_code)]
 struct MetricRow {
     id: Uuid,
     span_id: String,

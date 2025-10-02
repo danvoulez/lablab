@@ -297,7 +297,7 @@ fn parse_set_span_physics(tokens: Vec<String>) -> Option<ContractInstruction> {
 
 fn parse_range(token: &str) -> Option<(usize, usize)> {
     let cleaned = token.trim_matches(|c: char| c == '[' || c == ']' || c.is_whitespace());
-    let mut parts = cleaned.split(|c| c == '-' || c == ',');
+    let mut parts = cleaned.split(['-', ',']);
     let start = parts.next()?.trim();
     let end = parts.next()?.trim();
     let start_id = parse_residue(start)?;
@@ -314,7 +314,7 @@ fn is_range_token(token: &str) -> bool {
 }
 
 fn parse_rotate_positional(tokens: Vec<String>) -> Option<(usize, f64, u64)> {
-    let residue_token = tokens.get(0)?.as_str();
+    let residue_token = tokens.first()?.as_str();
     let angle_token = tokens.get(1)?.as_str();
     let duration_token = tokens.get(2).map(|s| s.as_str());
 

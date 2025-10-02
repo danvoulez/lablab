@@ -105,6 +105,12 @@ pub struct BidirectionalTwinBridge {
     config: SyncConfig,
 }
 
+impl Default for BidirectionalTwinBridge {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BidirectionalTwinBridge {
     pub fn new() -> Self {
         Self {

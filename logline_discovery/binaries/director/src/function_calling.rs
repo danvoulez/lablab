@@ -5,7 +5,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use tracing::{info, warn};
+use tracing::info;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FunctionCall {
@@ -43,6 +43,12 @@ pub struct ExecutionSummary {
 
 pub struct FunctionRegistry {
     functions: HashMap<String, String>, // function_name -> description
+}
+
+impl Default for FunctionRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl FunctionRegistry {

@@ -117,14 +117,14 @@ impl JobClient {
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             "#
         )
-        .bind(&job.id)
+        .bind(job.id)
         .bind(&job.name)
         .bind(&job.status)
         .bind(&job.priority)
         .bind(&job.payload)
-        .bind(&job.created_at)
-        .bind(&job.retry_count)
-        .bind(&job.max_retries)
+        .bind(job.created_at)
+        .bind(job.retry_count)
+        .bind(job.max_retries)
         .execute(&self.pool)
         .await?;
 
@@ -169,8 +169,8 @@ impl JobClient {
         }
 
         println!(
-            "{:<36} {:<20} {:<10} {:<20} {}",
-            "JOB ID", "NAME", "STATUS", "PRIORITY", "CREATED"
+            "{:<36} {:<20} {:<10} {:<20} CREATED",
+            "JOB ID", "NAME", "STATUS", "PRIORITY"
         );
         println!("{}", "-".repeat(100));
 
@@ -197,7 +197,7 @@ impl JobClient {
             FROM jobs WHERE id = $1
             "#,
         )
-        .bind(&job_id)
+        .bind(job_id)
         .fetch_optional(&self.pool)
         .await?;
 
@@ -237,7 +237,7 @@ impl JobClient {
             WHERE id = $1 AND status = 'queued'
             "#,
         )
-        .bind(&job_id)
+        .bind(job_id)
         .execute(&self.pool)
         .await?
         .rows_affected();
@@ -276,8 +276,8 @@ impl JobClient {
 
         if detailed {
             println!(
-                "{:<15} {:<10} {:<10} {:<10} {}",
-                "WORKER", "TOTAL", "SUCCESS", "FAILED", "LAST ACTIVITY"
+                "{:<15} {:<10} {:<10} {:<10} LAST ACTIVITY",
+                "WORKER", "TOTAL", "SUCCESS", "FAILED"
             );
             println!("{}", "-".repeat(70));
 

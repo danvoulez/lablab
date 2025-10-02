@@ -83,7 +83,7 @@ fn normalize(values: &[f64]) -> Vec<f64> {
     values.iter().map(|v| v.max(0.0) / sum).collect()
 }
 
-fn resolve_array<'a>(root: &'a Value, path: &str) -> Option<Vec<Value>> {
+fn resolve_array(root: &Value, path: &str) -> Option<Vec<Value>> {
     let mut current = root;
     for key in path.split('.') {
         current = current.get(key)?;

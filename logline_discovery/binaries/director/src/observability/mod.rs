@@ -1,6 +1,6 @@
 //! Observability and metrics for diagnostics
 
-use logline_common::{Error, Result};
+use logline_common::Result;
 
 pub mod metrics {
     use super::*;

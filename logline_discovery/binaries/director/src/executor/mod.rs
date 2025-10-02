@@ -1,8 +1,7 @@
 //! Integration with existing job queue system
 
 use crate::Contract;
-use logline_common::{Error, Result};
-use serde_json::Value;
+use logline_common::Result;
 use uuid::Uuid;
 
 pub mod job_submit {

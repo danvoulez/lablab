@@ -75,6 +75,7 @@ impl TriageEngine {
         }
     }
 
+    #[allow(dead_code)]
     pub fn load_rules<P: Into<PathBuf>>(path: P) -> Result<Self> {
         let path: PathBuf = path.into();
         if !path.exists() {
@@ -86,6 +87,7 @@ impl TriageEngine {
         Self::load_rules_from_string(&content)
     }
 
+    #[allow(dead_code)]
     pub fn load_rules_from_string(content: &str) -> Result<Self> {
         let rules: Vec<TriageRule> = toml::from_str(content)?;
         Ok(Self { rules })
@@ -179,7 +181,7 @@ impl TriageRule {
         for (key, expected) in &self.when {
             let actual = self.get_manifest_value(manifest, key)?;
 
-            if !self.compare_values(&expected, &actual)? {
+            if !self.compare_values(expected, &actual)? {
                 return Ok(false);
             }
         }
@@ -221,6 +223,7 @@ impl TriageRule {
     }
 }
 
+#[allow(dead_code)]
 pub fn make_plan_from_span(span: &UniversalSpan) -> Result<ExecutionPlan> {
     let manifest = TriageEngine::parse_manifest_from_span(span)?;
 
@@ -237,6 +240,7 @@ pub fn make_plan_from_span(span: &UniversalSpan) -> Result<ExecutionPlan> {
     engine.make_plan(&manifest)
 }
 
+#[allow(dead_code)]
 fn create_default_rules() -> TriageEngine {
     let default_toml = r#"
 # Default triage rules for LogLine Discovery Lab

@@ -4,7 +4,6 @@ use crate::mapping::{
     SubjectMetadata, TwinDivergenceMetadata, TwinObservationMetadata,
 };
 use anyhow::Result;
-use md5;
 use spans_core::UniversalSpan;
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use sqlx::types::Json;
