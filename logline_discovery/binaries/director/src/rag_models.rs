@@ -158,4 +158,14 @@ impl IntelligentRAGSelector {
         let mut rag = self.rag_system.lock().await;
         rag.add_knowledge(content, metadata).await
     }
+
+    pub async fn knowledge_count(&self) -> usize {
+        let rag = self.rag_system.lock().await;
+        rag.knowledge_count()
+    }
+
+    pub async fn search(&self, query: &str, limit: usize) -> Result<Vec<crate::rag::SearchResult>, Box<dyn std::error::Error>> {
+        let rag = self.rag_system.lock().await;
+        rag.search(query, limit).await
+    }
 }

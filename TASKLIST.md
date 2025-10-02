@@ -150,19 +150,19 @@ pub struct Job {
 **Prioridade**: 🟡 MÉDIA | **Estimativa**: 1 dia | **Responsável**: Dev Frontend
 
 #### **5.1 Corrigir Variáveis Não Utilizadas**
-- [ ] **Arquivo**: `binaries/director/src/api.rs:145`
-- [ ] **Warning**: `unused variable: rag`
-- [ ] **Solução**: Prefixar com `_rag` ou usar a variável
+- [x] **Arquivo**: `binaries/director/src/api.rs:145`
+- [x] **Warning**: `unused variable: rag`
+- [x] **Solução**: Utilizar o seletor RAG para consultar contagem real do acervo
 
 #### **5.2 Corrigir Imports Desnecessários**
-- [ ] **Buscar**: `#[warn(unused_imports)]` em todo director
-- [ ] **Remover**: Imports não utilizados
-- [ ] **Verificar**: `cargo clippy -p director`
+- [x] **Buscar**: `#[warn(unused_imports)]` em todo director
+- [x] **Remover**: Imports não utilizados
+- [x] **Verificar**: `cargo clippy -p director`
 
 #### **5.3 Corrigir Campos Mortos**
-- [ ] **Arquivo**: `binaries/director/src/api.rs:277`
-- [ ] **Warning**: `field 'limit' is never read`
-- [ ] **Solução**: Adicionar `#[allow(dead_code)]` ou usar o campo
+- [x] **Arquivo**: `binaries/director/src/api.rs:277`
+- [x] **Warning**: `field 'limit' is never read`
+- [x] **Solução**: Utilizar o parâmetro para limitar buscas reais na base RAG
 
 ### **6. 🔬 Discovery Agent - Warning Ownership**
 **Prioridade**: 🟡 BAIXA | **Estimativa**: 0.5 dia | **Responsável**: Dev Backend

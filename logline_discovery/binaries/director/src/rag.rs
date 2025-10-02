@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::path::Path;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
-use tracing::{info, warn, debug};
+use tracing::{debug, info};
 use sha2::{Sha256, Digest};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -107,6 +107,11 @@ impl RAGSystem {
 
         info!("Found {} relevant entries", results.len());
         Ok(results)
+    }
+
+    /// Return the total number of knowledge entries currently indexed
+    pub fn knowledge_count(&self) -> usize {
+        self.knowledge_base.len()
     }
 
     /// Get contextual information for a query

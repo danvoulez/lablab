@@ -10,6 +10,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -19,6 +20,7 @@ use tower_http::trace::TraceLayer;
 use tracing::{info, warn};
 
 use crate::rag_models::IntelligentRAGSelector;
+use crate::rag::EntryMetadata;
 use crate::function_calling::{FunctionRegistry, FunctionCall};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -132,7 +134,7 @@ async fn root_handler() -> Json<serde_json::Value> {
 
 async fn health_handler(State(state): State<ApiState>) -> Json<HealthResponse> {
     let uptime = state.start_time.elapsed().as_secs();
-    
+
     // Check available Ollama models
     let models_available = vec![
         "director-smart".to_string(),
@@ -142,9 +144,8 @@ async fn health_handler(State(state): State<ApiState>) -> Json<HealthResponse> {
     ];
 
     // Get knowledge base size
-    let knowledge_entries = if let Some(ref rag) = *state.rag_selector.lock().await {
-        // Would get actual count from RAG system
-        5 // Mock for now
+    let knowledge_entries = if let Some(ref selector) = *state.rag_selector.lock().await {
+        selector.knowledge_count().await
     } else {
         0
     };
@@ -256,13 +257,33 @@ async fn list_functions_handler(State(state): State<ApiState>) -> Json<serde_jso
 }
 
 async fn add_knowledge_handler(
-    State(_state): State<ApiState>,
+    State(state): State<ApiState>,
     Json(request): Json<KnowledgeRequest>,
 ) -> Result<Json<serde_json::Value>, StatusCode> {
     info!("🌐 Adding knowledge: {}", request.content);
 
-    // Would add to RAG system here
-    let entry_id = "mock_id_123"; // Mock for now
+    let metadata = EntryMetadata {
+        timestamp: Utc::now().to_rfc3339(),
+        source: request.source.clone(),
+        category: request.category.clone(),
+        subject: request.subject.clone(),
+        priority: request.priority.clone(),
+    };
+
+    let entry_id = {
+        let rag_selector = state.rag_selector.lock().await;
+        let selector = rag_selector
+            .as_ref()
+            .ok_or(StatusCode::SERVICE_UNAVAILABLE)?;
+
+        selector
+            .add_knowledge(&request.content, metadata)
+            .await
+            .map_err(|e| {
+                warn!("Failed to add knowledge: {}", e);
+                StatusCode::INTERNAL_SERVER_ERROR
+            })?
+    };
 
     Ok(Json(serde_json::json!({
         "success": true,
@@ -274,36 +295,53 @@ async fn add_knowledge_handler(
 #[derive(Deserialize)]
 struct SearchQuery {
     q: String,
-    #[allow(dead_code)]
     limit: Option<usize>,
 }
 
 async fn search_knowledge_handler(
-    State(_state): State<ApiState>,
+    State(state): State<ApiState>,
     Query(params): Query<SearchQuery>,
-) -> Json<serde_json::Value> {
+) -> Result<Json<serde_json::Value>, StatusCode> {
     info!("🌐 Searching knowledge: '{}'", params.q);
 
-    // Mock search results
-    let results = serde_json::json!({
-        "query": params.q,
-        "results": [
-            {
-                "id": "entry_1",
-                "content": "Simulação de docking para compostos anti-HIV falhou devido a recursos insuficientes",
-                "similarity": 0.85,
-                "metadata": {
-                    "timestamp": "2025-09-30T14:30:00Z",
-                    "source": "span",
-                    "category": "error",
-                    "subject": "HIV"
-                }
-            }
-        ],
-        "total_found": 1
-    });
+    let limit = params.limit.unwrap_or(10).clamp(1, 50);
 
-    Json(results)
+    let rag_selector = state.rag_selector.lock().await;
+    let selector = rag_selector
+        .as_ref()
+        .ok_or(StatusCode::SERVICE_UNAVAILABLE)?;
+
+    let results = selector
+        .search(&params.q, limit)
+        .await
+        .map_err(|e| {
+            warn!("Failed to search knowledge base: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    let formatted_results: Vec<serde_json::Value> = results
+        .into_iter()
+        .map(|result| {
+            serde_json::json!({
+                "id": result.entry.id,
+                "content": result.entry.content,
+                "similarity": result.similarity,
+                "metadata": {
+                    "timestamp": result.entry.metadata.timestamp,
+                    "source": result.entry.metadata.source,
+                    "category": result.entry.metadata.category,
+                    "subject": result.entry.metadata.subject,
+                    "priority": result.entry.metadata.priority,
+                }
+            })
+        })
+        .collect();
+
+    Ok(Json(serde_json::json!({
+        "query": params.q,
+        "results": formatted_results,
+        "total_found": formatted_results.len(),
+    })))
 }
 
 pub async fn start_api_server(port: u16) -> Result<(), Box<dyn std::error::Error>> {
