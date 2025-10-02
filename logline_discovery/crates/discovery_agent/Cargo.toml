@@ -1,0 +1,17 @@
+[package]
+name = "discovery_agent"
+version = "0.1.0"
+edition = "2021"
+description = "LLM-assisted orchestration over lab artifacts"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+folding_runtime = { path = "../folding_runtime" }
+causal_engine = { path = "../causal_engine" }
+structural_similarity = { path = "../structural_similarity" }
+manuscript_generator = { path = "../manuscript_generator" }
+spans_core = { path = "../spans_core" }

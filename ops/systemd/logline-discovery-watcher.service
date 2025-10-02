@@ -1,0 +1,17 @@
+[Unit]
+Description=LogLine Discovery Lab Span Watcher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/LogLine Discovery Lab/logline_discovery
+EnvironmentFile=%h/LogLine Discovery Lab/logline_discovery/.env
+ExecStart=/usr/bin/env bash -lc 'cargo run -p hiv_discovery_runner -- watch --path "%h/Library/Mobile Documents/com~apple~CloudDocs/LogLine Fold/Backend/spans" --recursive --interval 60'
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

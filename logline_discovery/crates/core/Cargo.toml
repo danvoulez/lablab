@@ -1,0 +1,16 @@
+[package]
+name = "folding_core"
+version = "0.1.0"
+edition = "2021"
+description = "Core folding engine primitives"
+
+[features]
+default = []
+openmm = ["serde", "serde_json"]
+
+[dependencies]
+folding_time = { path = "../time" }
+folding_molecule = { path = "../molecule" }
+rand = { workspace = true, features = ["std", "std_rng"] }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }

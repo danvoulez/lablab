@@ -1,0 +1,33 @@
+{
+  "span_id": "span::twin_observation::001",
+  "name": "Digital Twin Observation",
+  "flow": "twin_observation",
+  "workflow": "exec_001",
+  "parent_id": "exec_001",
+  "started_at": "2024-01-15T10:30:00Z",
+  "finished_at": "2024-01-15T10:30:05Z",
+  "metadata": {
+    "execution_span": "exec_001",
+    "twin_type": "digital",
+    "observations": {
+      "temperature": 298.15,
+      "pressure": 1.013,
+      "potential_energy": -1250.5,
+      "kinetic_energy": 450.2,
+      "total_energy": -800.3,
+      "rmsd_backbone": 2.15,
+      "rmsd_sidechain": 3.42,
+      "radius_gyration": 12.8,
+      "solvent_accessible_surface": 1250.7
+    },
+    "simulation_metadata": {
+      "force_field": "amber99sb",
+      "water_model": "tip3p",
+      "box_type": "cubic",
+      "box_size": 45.2,
+      "integrator": "langevin",
+      "time_step": 0.002,
+      "temperature_coupling": "berendsen"
+    }
+  }
+}

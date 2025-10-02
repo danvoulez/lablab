@@ -1,0 +1,34 @@
+[Unit]
+Description=LogLine Discovery Lab Director (Unified front-office and back-office)
+After=network-online.target postgresql.service
+Wants=network-online.target postgresql.service
+
+[Service]
+Type=simple
+User=logline
+Group=logline
+WorkingDirectory=%h/logline_discovery_lab
+EnvironmentFile=%h/logline_discovery_lab/.env
+ExecStart=/usr/bin/env bash -lc 'cargo run -p director -- --database-url "${DATABASE_URL}" --actor-id "logline-id://director" --actor-role "admin"'
+Restart=always
+RestartSec=10
+
+# Resource limits
+MemoryLimit=512M
+TimeoutStartSec=30
+TimeoutStopSec=30
+
+# Security hardening
+DynamicUser=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=%h/logline_discovery_lab
+PrivateTmp=yes
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=logline-director
+
+[Install]
+WantedBy=multi-user.target

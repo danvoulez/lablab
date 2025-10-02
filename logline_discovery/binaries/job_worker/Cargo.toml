@@ -1,0 +1,22 @@
+[package]
+name = "job_worker"
+version = "0.1.0"
+edition = "2021"
+description = "PostgreSQL job queue worker for LogLine Discovery Lab"
+
+[dependencies]
+# Local crates
+logline_common = { path = "../../crates/common" }
+
+# Workspace dependencies
+anyhow = { workspace = true }
+chrono = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = "0.3"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "signal"] }
+sqlx = { workspace = true }
+clap = { workspace = true }
+dotenvy = { workspace = true }
+uuid = { workspace = true }

@@ -1,0 +1,2 @@
+# Railway Deployment
+web: ./target/release/director serve --port $PORT

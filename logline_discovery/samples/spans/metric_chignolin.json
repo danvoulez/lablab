@@ -1,0 +1,11 @@
+{
+  "span_id": "span::metric::chignolin::rmsd",
+  "flow": "metric",
+  "metadata": {
+    "execution_span": "span::execution::chignolin",
+    "metric_name": "final_rmsd_angstrom",
+    "value": 0.42,
+    "unit": "angstrom",
+    "recorded_at": "2025-09-27T19:55:11Z"
+  }
+}

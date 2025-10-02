@@ -1,0 +1,70 @@
+# 🧬 LogLine Discovery Lab - Project GitIgnore
+# ============================================
+
+# 🦀 Rust build artifacts
+/target/
+**/*.rs.bk
+*.pdb
+
+# 📊 Generated data and logs
+/data/
+/logs/
+*.log
+*.log.*
+/tmp/
+/temp/
+
+# 🗄️ Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# 🔑 Environment and secrets
+.env
+.env.local
+.env.production
+slack-app-manifest-updated.json
+**/auth_tokens.json
+**/api_keys.json
+
+# 🤖 AI models and cache
+/models/
+/cache/
+ollama_cache/
+*.gguf
+*.bin
+
+# 📦 Release artifacts
+/releases/
+*.tar.gz
+*.zip
+
+# 🧪 Test artifacts
+/test-results/
+/coverage/
+
+# 📱 OS files
+.DS_Store
+Thumbs.db
+
+# 📝 Editor files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# 🧬 Laboratory specific
+/simulations/
+/results/
+/experiments/
+knowledge_base_backup_*.json
+spans_*.ndjson
+
+# 🔧 Tool specific
+.cargo/
+compile_commands.json
+
+# 📊 Monitoring
+/metrics/
+/traces/
+*.metrics

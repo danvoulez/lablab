@@ -1,0 +1,46 @@
+# 📦 LogLine Discovery Lab - Release Configuration
+
+[release]
+version = "1.0.0"
+name = "Laboratório Farmacêutico IA"
+codename = "HIV Discovery Pioneer"
+date = "2025-10-02"
+
+[components]
+director = "1.0.0"
+hiv_discovery_runner = "1.0.0"
+discovery_dashboard = "1.0.0"
+spans_core = "1.0.0"
+folding_runtime = "1.0.0"
+causal_engine = "1.0.0"
+discovery_agent = "1.0.0"
+
+[features]
+rag_system = true
+function_calling = true
+slack_integration = true
+rest_api = true
+web_dashboard = true
+scientific_engines = true
+hiv_focus = true
+
+[requirements]
+rust = "1.70+"
+postgresql = "15+"
+redis = "7+"
+ollama = "latest"
+
+[targets]
+primary = "aarch64-apple-darwin"  # Mac Mini M-series
+secondary = ["x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]
+
+[deployment]
+local = true
+railway = "planned"
+docker = "planned"
+
+[documentation]
+readme = "README.md"
+changelog = "CHANGELOG.md"
+api_docs = "docs/api.md"
+setup_guide = "docs/setup.md"

@@ -1,0 +1,13 @@
+{
+  "span_id": "span::protocol::chignolin",
+  "flow": "protocol_config",
+  "metadata": {
+    "subject_span": "span::subject::chignolin",
+    "recipe_name": "loglineforce_equivariant",
+    "parameters": {
+      "integrator": "velocity_verlet",
+      "temperature_k": 300,
+      "timestep_fs": 2
+    }
+  }
+}

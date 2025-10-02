@@ -1,0 +1,9 @@
+[package]
+name = "folding_molecule"
+version = "0.1.0"
+edition = "2021"
+description = "Molecular models for folding core"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }

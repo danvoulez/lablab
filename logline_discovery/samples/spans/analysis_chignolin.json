@@ -1,0 +1,13 @@
+{
+  "span_id": "span::analysis::chignolin",
+  "flow": "analysis",
+  "metadata": {
+    "execution_span": "span::execution::chignolin",
+    "analysis_type": "folding_summary",
+    "summary": {
+      "mean_energy": -92.5,
+      "max_rmsd": 0.42,
+      "unstable": false
+    }
+  }
+}

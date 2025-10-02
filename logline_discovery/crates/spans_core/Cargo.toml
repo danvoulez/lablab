@@ -1,0 +1,11 @@
+[package]
+name = "spans_core"
+version = "0.1.0"
+edition = "2021"
+description = "Shared span representations for the LogLine Discovery Lab"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+anyhow = { workspace = true }

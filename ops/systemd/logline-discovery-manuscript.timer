@@ -1,0 +1,11 @@
+[Unit]
+Description=Run LogLine Discovery Lab manuscript job hourly
+
+[Timer]
+Unit=logline-discovery-manuscript.service
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

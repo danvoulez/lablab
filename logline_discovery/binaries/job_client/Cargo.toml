@@ -1,0 +1,22 @@
+[package]
+name = "job_client"
+version = "0.1.0"
+edition = "2021"
+description = "Job queue client for submitting jobs to LogLine Discovery Lab"
+
+[dependencies]
+# Local crates
+logline_common = { path = "../../crates/common" }
+
+# Workspace dependencies
+anyhow = { workspace = true }
+chrono = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = "0.3"
+tokio = { workspace = true }
+sqlx = { workspace = true }
+clap = { workspace = true }
+dotenvy = { workspace = true }
+uuid = { workspace = true }

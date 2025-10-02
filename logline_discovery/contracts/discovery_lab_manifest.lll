@@ -1,0 +1,10 @@
+contract discovery_lab_manifest {
+  version = "1.0"
+  description = "Nightly automation status for watcher/manuscript jobs"
+  ledger_path = "logline_discovery/ledger/spans/discovery.ndjson"
+  postgres = "postgres://localhost/logline_discovery"
+  jobs = [
+    { name = "watcher", command = "cargo run -p hiv_discovery_runner -- watch ..." },
+    { name = "manuscript", command = "./scripts/run_manuscript_job.sh" }
+  ]
+}

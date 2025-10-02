@@ -1,0 +1,9 @@
+# Demo contract for folding engine
+span_alias tilt_alpha
+rotate residue=2 angle=28 duration=6
+clash_check
+commit
+
+span_alias tilt_beta
+rotate residue=3 angle=-18 duration=8
+commit

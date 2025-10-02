@@ -1,0 +1,33 @@
+[Unit]
+Description=LogLine Discovery Lab Job Queue Scheduler
+After=network-online.target postgresql.service
+Wants=network-online.target postgresql.service
+PartOf=logline-discovery-scheduler.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/logline_discovery_lab
+EnvironmentFile=%h/logline_discovery_lab/.env
+ExecStart=/usr/bin/env bash -lc 'cargo run -p job_scheduler -- --database-url "${DATABASE_URL}" --interval-seconds 30 --batch-size 10'
+Restart=always
+RestartSec=10
+
+# Resource limits
+MemoryLimit=512M
+TimeoutStartSec=30
+TimeoutStopSec=30
+
+# Security hardening
+DynamicUser=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=%h/logline_discovery_lab
+PrivateTmp=yes
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=logline-scheduler
+
+[Install]
+WantedBy=logline-discovery-scheduler.target

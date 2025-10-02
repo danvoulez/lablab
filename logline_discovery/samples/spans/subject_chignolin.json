@@ -1,0 +1,9 @@
+{
+  "span_id": "span::subject::chignolin",
+  "flow": "subject_init",
+  "metadata": {
+    "subject_type": "protein",
+    "subject_identifier": "chignolin",
+    "intent": "folding"
+  }
+}

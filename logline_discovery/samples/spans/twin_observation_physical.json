@@ -1,0 +1,31 @@
+{
+  "span_id": "span::twin_observation::002",
+  "name": "Physical Twin Observation",
+  "flow": "twin_observation",
+  "workflow": "exec_001",
+  "parent_id": "exec_001",
+  "started_at": "2024-01-15T10:30:00Z",
+  "finished_at": "2024-01-15T10:30:05Z",
+  "metadata": {
+    "execution_span": "exec_001",
+    "twin_type": "physical",
+    "observations": {
+      "temperature": 298.15,
+      "pressure": 1.013,
+      "potential_energy": -1248.3,
+      "kinetic_energy": 448.9,
+      "total_energy": -799.4,
+      "rmsd_backbone": 2.18,
+      "rmsd_sidechain": 3.45,
+      "radius_gyration": 12.9,
+      "solvent_accessible_surface": 1248.2
+    },
+    "experimental_metadata": {
+      "experiment_type": "xray_crystallography",
+      "resolution": 1.8,
+      "temperature": 100,
+      "ph": 7.0,
+      "buffer": "tris_hcl"
+    }
+  }
+}

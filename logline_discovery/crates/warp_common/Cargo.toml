@@ -1,0 +1,10 @@
+[package]
+name = "warp_common"
+version = "0.1.0"
+edition = "2021"
+description = "Shared types from the original LogLine Warp runtime"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+rand = { workspace = true }

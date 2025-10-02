@@ -1,0 +1,99 @@
+{
+  "display_information": {
+    "name": "LogLine Director",
+    "description": "Intelligent laboratory management assistant for drug discovery with RAG and function calling capabilities",
+    "background_color": "#1e3a8a",
+    "long_description": "LogLine Director is an AI-powered laboratory management assistant specifically designed for pharmaceutical research and drug discovery labs. It provides intelligent monitoring, diagnostics, and management of molecular simulations, QSAR analysis, docking studies, and computational workflows. Features include contextual knowledge retrieval (RAG), real-time system monitoring, and natural language interaction in Portuguese."
+  },
+  "features": {
+    "app_home": {
+      "home_tab_enabled": true,
+      "messages_tab_enabled": true,
+      "messages_tab_read_only_enabled": false
+    },
+    "bot_user": {
+      "display_name": "Director",
+      "always_online": true
+    },
+    "slash_commands": [
+      {
+        "command": "/director",
+        "url": "SUBSTITUA_PELA_SUA_URL_NGROK/slack/slash",
+        "description": "Converse with the LogLine Discovery Lab Director",
+        "usage_hint": "como está a fila de processamento?",
+        "should_escape": false
+      },
+      {
+        "command": "/lab-status",
+        "url": "SUBSTITUA_PELA_SUA_URL_NGROK/slack/slash",
+        "description": "Get quick laboratory status overview",
+        "usage_hint": "",
+        "should_escape": false
+      },
+      {
+        "command": "/lab-diagnose",
+        "url": "SUBSTITUA_PELA_SUA_URL_NGROK/slack/slash",
+        "description": "Run laboratory diagnostics and health checks",
+        "usage_hint": "HIV simulations",
+        "should_escape": false
+      },
+      {
+        "command": "/submit-job",
+        "url": "SUBSTITUA_PELA_SUA_URL_NGROK/slack/slash",
+        "description": "Submit a new computational job to the laboratory queue",
+        "usage_hint": "molecular docking for COVID-19 compounds",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "app_mentions:read",
+        "channels:history",
+        "channels:read",
+        "chat:write",
+        "chat:write.customize",
+        "chat:write.public",
+        "commands",
+        "files:read",
+        "files:write",
+        "groups:history",
+        "groups:read",
+        "im:history",
+        "im:read",
+        "im:write",
+        "incoming-webhook",
+        "mpim:history",
+        "mpim:read",
+        "mpim:write",
+        "reactions:read",
+        "reactions:write",
+        "team:read",
+        "users:read",
+        "users:read.email"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "SUBSTITUA_PELA_SUA_URL_NGROK/slack/events",
+      "bot_events": [
+        "app_mention",
+        "message.channels",
+        "message.groups",
+        "message.im",
+        "message.mpim",
+        "reaction_added",
+        "reaction_removed"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "SUBSTITUA_PELA_SUA_URL_NGROK/slack/interactive"
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}

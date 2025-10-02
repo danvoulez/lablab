@@ -1,0 +1,11 @@
+[package]
+name = "folding_time"
+version = "0.1.0"
+edition = "2021"
+description = "Time and trajectory helpers for folding core"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+# re-exported trait uses chrono
+chrono = { workspace = true }

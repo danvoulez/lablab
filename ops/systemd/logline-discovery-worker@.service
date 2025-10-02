@@ -1,0 +1,33 @@
+[Unit]
+Description=LogLine Discovery Lab Job Queue Worker %i
+After=network-online.target postgresql.service
+Wants=network-online.target postgresql.service
+PartOf=logline-discovery-workers.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/logline_discovery_lab
+EnvironmentFile=%h/logline_discovery_lab/.env
+ExecStart=/usr/bin/env bash -lc 'cargo run -p job_worker -- --database-url "${DATABASE_URL}" --worker-id "worker-%i" --job-timeout-minutes 60'
+Restart=always
+RestartSec=10
+
+# Resource limits
+MemoryLimit=1G
+TimeoutStartSec=30
+TimeoutStopSec=30
+
+# Security hardening
+DynamicUser=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=%h/logline_discovery_lab
+PrivateTmp=yes
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=logline-worker-%i
+
+[Install]
+WantedBy=logline-discovery-workers.target

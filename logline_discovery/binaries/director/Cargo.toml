@@ -1,0 +1,57 @@
+[package]
+name = "director"
+version = "1.0.0"
+edition = "2021"
+description = "LogLine Discovery Lab Director - Agente conversacional inteligente para laboratório farmacêutico"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/logline/discovery-lab"
+keywords = ["ai", "drug-discovery", "hiv", "conversation", "laboratory"]
+categories = ["science", "command-line-utilities", "web-programming"]
+
+[dependencies]
+# runtime / async
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "process", "full"] }
+
+# serde/json
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# traits async
+async-trait = "0.1"
+
+# utilitários
+uuid = { version = "1", features = ["v4"] }
+chrono = "0.4"
+
+# postgres/ops
+tokio-postgres = "0.7"
+sysinfo = "0.30"
+sha2 = "0.10"
+hex = "0.4"
+
+# HTTP client for Ollama
+reqwest = { version = "0.11", features = ["json"] }
+
+# OpenAI API client
+async-openai = "0.20"
+
+# Web API Server
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+hyper = { version = "1.0", features = ["full"] }
+
+# Caching
+moka = { version = "0.12", features = ["future"] }
+
+# cli e logs USADOS PELO BINARIO director.rs
+clap = { version = "4", features = ["derive", "env"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# seu crate comum
+logline_common = { path = "../../crates/common" }
+
+[[bin]]
+name = "director"
+path = "src/bin/director.rs"

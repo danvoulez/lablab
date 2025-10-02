@@ -1,0 +1,68 @@
+# Default triage rules for LogLine Discovery Lab
+# Edit this file to change pipeline behavior without recompiling
+
+[[rule]]
+name = "Raw sequence pipeline"
+when.kind = "raw_sequence"
+then = ["QualityAssessment", "QSAR", "Simulate", "Validate", "Manuscript"]
+
+[[rule]]
+name = "QSAR candidate pipeline"
+when.kind = "qsar_candidate"
+when.qsar_score = "< 0.7"
+then = ["QSAR"]
+
+[[rule]]
+name = "Docked structure pipeline"
+when.docked = "true"
+when.docking_affinity = "< -8"
+then = ["Validate", "Manuscript"]
+
+[[rule]]
+name = "Skip simulation for Amber"
+when.force_field = "Amber99SB"
+then = ["!Simulate"]
+
+[[rule]]
+name = "CI mode - skip manuscript"
+env = "CI"
+then = ["!Manuscript"]
+
+[[rule]]
+name = "Twin comparison pipeline"
+when.kind = "twin_observation"
+then = ["TwinComparison", "Validate"]
+
+[[rule]]
+name = "High quality execution"
+when.kind = "execution_run"
+when.status = "completed"
+then = ["CausalAnalysis", "StructuralSimilarity", "Manuscript"]
+
+[[rule]]
+name = "Low quality skip heavy analysis"
+when.quality_score = "< 0.6"
+then = ["!CausalAnalysis", "!StructuralSimilarity"]
+
+[[rule]]
+name = "GPU intensive for high scoring candidates"
+when.qsar_score = "> 0.8"
+when.docking_affinity = "< -10"
+then = ["Simulate", "TwinComparison", "Validate", "CausalAnalysis", "Manuscript"]
+
+[[rule]]
+name = "Quick validation for known structures"
+when.kind = "structure_known"
+when.rmsd_threshold_passed = "true"
+then = ["Validate", "Manuscript"]
+
+[[rule]]
+name = "Development mode - minimal pipeline"
+env = "DEV"
+then = ["QualityAssessment"]
+
+[[rule]]
+name = "Production mode - full pipeline"
+env = "PROD"
+when.kind = "raw_sequence"
+then = ["QualityAssessment", "QSAR", "Docking", "Simulate", "TwinComparison", "Validate", "CausalAnalysis", "StructuralSimilarity", "Manuscript"]

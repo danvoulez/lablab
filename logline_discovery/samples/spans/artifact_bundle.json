@@ -1,0 +1,10 @@
+{
+  "span_id": "span::artifact::chignolin::bundle",
+  "flow": "artifact_manifest",
+  "metadata": {
+    "execution_span": "span::execution::chignolin",
+    "artifact_kind": "bundle",
+    "storage_path": "artifacts/chignolin/bundle.zip",
+    "checksum": "bundle123"
+  }
+}

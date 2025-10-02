@@ -1,0 +1,15 @@
+[package]
+name = "warp_span_fabricator"
+version = "0.1.0"
+edition = "2021"
+description = "Synthetic span utilities from LogLine Warp"
+
+[dependencies]
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { workspace = true, optional = true }
+
+[features]
+default = []
+cli = ["clap"]

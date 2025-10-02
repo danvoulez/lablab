@@ -1,0 +1,330 @@
+# 🧬 LogLine Discovery Lab - GitIgnore
+# ==========================================
+
+# 🦀 Rust
+/target/
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# 🔧 Build artifacts
+/releases/
+/dist/
+/build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# 📊 Data & Logs
+/data/
+/logs/
+*.log
+*.log.*
+/tmp/
+/temp/
+
+# 🗄️ Database
+*.db
+*.sqlite
+*.sqlite3
+/db/data/
+/postgres_data/
+
+# 🔑 Secrets & Config
+.env
+.env.local
+.env.production
+.env.staging
+*.key
+*.pem
+*.p12
+*.pfx
+config/secrets.toml
+slack-app-manifest-updated.json
+
+# 🤖 AI Models & Cache
+/models/
+/cache/
+*.gguf
+*.bin
+*.safetensors
+ollama_cache/
+
+# 📱 macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 🐧 Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# 🪟 Windows
+*.tmp
+*.temp
+*.swp
+*.swo
+desktop.ini
+$RECYCLE.BIN/
+
+# 📝 Editors & IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vim/
+.netrwhist
+*.sublime-project
+*.sublime-workspace
+
+# 📦 Node.js (para dashboard)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+package-lock.json
+yarn.lock
+
+# 🐍 Python (para ST-GNN)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 📊 Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# 🧪 Testing
+/coverage/
+.nyc_output/
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+
+# 📈 Monitoring & Metrics
+/metrics/
+/traces/
+/spans/
+prometheus_data/
+grafana_data/
+
+# 🔄 CI/CD
+.github/workflows/secrets/
+.circleci/
+.travis.yml
+.gitlab-ci.yml
+
+# 🚀 Deployment
+/deploy/
+/k8s/secrets/
+docker-compose.override.yml
+.dockerignore
+
+# 📚 Documentation builds
+/docs/_build/
+/docs/site/
+.mkdocs/
+
+# 🧬 Laboratory specific
+/simulations/
+/results/
+/experiments/
+/compounds/
+/trajectories/
+*.pdb
+*.xyz
+*.mol2
+*.sdf
+
+# 🔬 Scientific data
+/datasets/
+/training_data/
+/validation_data/
+*.csv.gz
+*.parquet
+*.h5
+*.hdf5
+
+# 📊 Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*~
+
+# 🔐 Security
+*.crt
+*.csr
+*.key
+*.p12
+*.pem
+*.pfx
+auth_tokens.json
+api_keys.json
+
+# 🎯 Temporary files
+.tmp/
+.temp/
+scratch/
+sandbox/
+
+# 📱 Mobile development
+*.ipa
+*.apk
+*.aab
+
+# 🌐 Web assets
+/static/dist/
+/public/dist/
+/assets/dist/
+
+# 🔧 Tool-specific
+.cargo/
+.rustup/
+.gradle/
+.maven/
+
+# 📋 OS generated
+.fseventsd/
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# 🧪 Test artifacts
+/test-results/
+/test-reports/
+junit.xml
+coverage.xml
+
+# 🎨 Design files
+*.sketch
+*.fig
+*.xd
+*.ai
+*.psd
+
+# 📦 Package managers
+Pipfile.lock
+poetry.lock
+composer.lock
+mix.lock
+
+# 🔄 Version control
+.svn/
+.hg/
+.bzr/
+
+# 🚀 Deployment artifacts
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# 🧬 LogLine specific patterns
+logline_*.log
+director_*.log
+discovery_*.log
+hiv_*.log
+spans_*.ndjson
+knowledge_base_backup_*.json
+
+# 🤖 AI/ML artifacts
+/checkpoints/
+/saved_models/
+/tensorboard_logs/
+*.ckpt
+*.pt
+*.pth
+*.model
+
+# 📊 Analytics
+/analytics/
+/reports/
+*.report
+*.analysis
+
+# 🔧 Build tools
+.ninja_deps
+.ninja_log
+compile_commands.json
+.clangd/
+
+# 🎯 IDE specific
+.fleet/
+.nova/
+*.code-workspace
+
+# 🧪 Laboratory notebooks
+/lab_notebooks/
+/research_notes/
+*.md.backup
+
+# 🔐 Certificates and keys
+ssl/
+certs/
+keys/
+*.crt
+*.key
+*.pem
+
+# 📱 Mobile specific
+ios/
+android/
+.expo/
+.expo-shared/
+
+# 🌐 Web specific
+.next/
+.nuxt/
+.svelte-kit/
+dist/
+build/
+
+# 🎨 Assets
+/assets/generated/
+/public/generated/
+*.generated.*
+
+# 🔄 Sync files
+.sync/
+*.sync-conflict-*
+*conflicted*
+
+# 📊 Metrics and monitoring
+/monitoring/
+/observability/
+*.metrics
+*.traces
+
+# 🧬 Scientific computing
+/simulations/output/
+/molecular_dynamics/
+/qsar_models/
+/docking_results/
+
+# 🎯 Final catch-all for sensitive data
+*secret*
+*private*
+*confidential*
+*internal*

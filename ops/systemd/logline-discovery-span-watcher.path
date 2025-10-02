@@ -1,0 +1,10 @@
+[Unit]
+Description=Watch for new spans in LogLine Discovery Lab ledger
+PartOf=logline-discovery-watcher.service
+
+[Path]
+PathModified=%h/logline_discovery_lab/ledger/spans/discovery.ndjson
+Unit=logline-discovery-span-processor.service
+
+[Install]
+WantedBy=multi-user.target

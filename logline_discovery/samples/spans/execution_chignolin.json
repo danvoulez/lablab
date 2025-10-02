@@ -1,0 +1,11 @@
+{
+  "span_id": "span::execution::chignolin",
+  "flow": "execution_run",
+  "metadata": {
+    "subject_span": "span::subject::chignolin",
+    "protocol_span": "span::protocol::chignolin",
+    "status": "completed",
+    "started_at": "2025-09-27T19:51:10Z",
+    "finished_at": "2025-09-27T19:55:10Z"
+  }
+}

@@ -1,0 +1,24 @@
+[Unit]
+Description=LogLine Discovery Lab Span Processor (Triggered by file changes)
+After=network-online.target postgresql.service
+Wants=network-online.target postgresql.service
+PartOf=logline-discovery-watcher.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/logline_discovery_lab
+EnvironmentFile=%h/logline_discovery_lab/.env
+ExecStart=/usr/bin/env bash -lc 'cargo run -p hiv_discovery_runner -- process-recent-spans'
+RemainAfterExit=no
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+DynamicUser=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=%h/logline_discovery_lab
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

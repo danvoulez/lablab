@@ -1,0 +1,10 @@
+{
+  "span_id": "span::folding::gp41::seed",
+  "name": "gp41 folding seed",
+  "flow": "protein_folding",
+  "workflow": "hiv_reservoir_mapping",
+  "protein": "gp41",
+  "timestamp": "2025-09-29T20:00:00Z",
+  "rmsd_series": [2.0, 3.0, 6.5, 4.5],
+  "energy_series": [-120.0, -118.5, -122.1]
+}

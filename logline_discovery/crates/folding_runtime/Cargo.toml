@@ -1,0 +1,12 @@
+[package]
+name = "folding_runtime"
+version = "0.1.0"
+edition = "2021"
+description = "Local analyses over protein folding spans"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+anyhow = { workspace = true }
+spans_core = { path = "../spans_core" }

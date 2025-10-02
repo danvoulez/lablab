@@ -1,0 +1,15 @@
+{
+  "span_id": "span::manuscript::chignolin",
+  "flow": "manuscript",
+  "metadata": {
+    "execution_span": "span::execution::chignolin",
+    "title": "Chignolin Folding Results",
+    "format": "markdown",
+    "storage_path": "artifacts/chignolin/report.md",
+    "checksum": "abc123",
+    "metadata": {
+      "authors": ["Discovery Lab"],
+      "generated_at": "2025-09-27T20:00:00Z"
+    }
+  }
+}

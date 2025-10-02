@@ -1,0 +1,48 @@
+[workspace]
+members = [
+    "crates/spans_core",
+    "crates/span_ingestor",
+    "crates/folding_runtime",
+    "crates/structural_similarity",
+    "crates/causal_engine",
+    "crates/digital_twin_bridge",
+    "crates/manuscript_generator",
+    "crates/discovery_agent",
+    "crates/common",
+    "crates/warp_common",
+    "crates/warp_ledger_vault",
+    "crates/warp_span_fabricator",
+    "binaries/hiv_discovery_runner",
+    "binaries/discovery_dashboard",
+    "binaries/job_scheduler",
+    "binaries/job_worker",
+    "binaries/job_client",
+    "binaries/director",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+anyhow = "1.0"
+thiserror = "1.0"
+petgraph = "0.6"
+rayon = "1.7"
+tracing = "0.1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid", "json", "chrono"] }
+clap = { version = "4.5", features = ["derive"] }
+dotenvy = "0.15"
+uuid = { version = "1", features = ["serde", "v4"] }
+md5 = "0.7"
+walkdir = "2"
+notify = { version = "6", default-features = true }
+axum = { version = "0.7", features = ["macros"] }
+tower = "0.4"
+once_cell = "1.19"
+rand = "0.8"
+toml = "0.8"

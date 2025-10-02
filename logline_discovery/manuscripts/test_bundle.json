@@ -1,0 +1,19 @@
+{
+  "title": "HIV Reservoir Instability — First Look",
+  "abstract_text": "Generated on 2025-09-29T22:58:21.917746+00:00 with 1 spans",
+  "analyses": [
+    {
+      "span_id": "span::execution::chignolin",
+      "protein": "unknown",
+      "mean_energy": -92.5,
+      "max_rmsd": 0.42,
+      "unstable": false,
+      "window": [
+        "2025-09-27T19:51:10Z",
+        "2025-09-27T19:55:10Z"
+      ]
+    }
+  ],
+  "causal_chains": [],
+  "similarity": []
+}

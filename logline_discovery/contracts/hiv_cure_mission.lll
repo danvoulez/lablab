@@ -1,0 +1,5 @@
+contract hiv_cure_mission {
+  version = "1.0"
+  mission = "functional_remission"
+  success_threshold = "reservoir_reduction > 2_log"
+}

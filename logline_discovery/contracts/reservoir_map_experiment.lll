@@ -1,0 +1,4 @@
+contract reservoir_map_experiment {
+  version = "1.0"
+  description = "Map latent reservoirs across tissues with folding instability markers"
+}

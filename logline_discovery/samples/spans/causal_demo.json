@@ -1,0 +1,30 @@
+[
+  {
+    "span_id": "span::sys::cpu_spike",
+    "name": "cpu spike",
+    "flow": "system_monitoring",
+    "workflow": "ops",
+    "timestamp": "2025-09-29T22:10:00Z",
+    "metadata": {
+      "cpu_usage": 0.92,
+      "latency_ms": 180,
+      "status": "degraded"
+    }
+  },
+  {
+    "span_id": "span::sim::fold_step",
+    "name": "fold step",
+    "flow": "protein_folding",
+    "workflow": "fold_pipeline",
+    "timestamp": "2025-09-29T22:10:02Z",
+    "protein": "chignolin",
+    "results": {
+      "final_energy_kcal_mol": -95.0,
+      "final_rmsd_angstrom": 0.8
+    },
+    "execution": {
+      "simulation_time_ns": 0.3,
+      "performance_ns_per_day": 70000
+    }
+  }
+]
