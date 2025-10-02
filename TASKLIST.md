@@ -12,9 +12,9 @@
 - 🧠 **RAG System**: Knowledge base contextual
 - 📱 **Slack Bot**: Integração profissional
 - 🌐 **API REST**: 7 endpoints funcionais
+- 🧬 **HIV Discovery Runner**: Correções de sintaxe e pipeline de processamento saudável
 
 ### **🔄 EM PROGRESSO**
-- 🧬 **HIV Discovery Runner**: Correções de sintaxe
 - ⚡ **Job System**: Correções de compilação
 - 📊 **Observabilidade**: Implementação OpenTelemetry
 
@@ -31,9 +31,9 @@
 **Prioridade**: 🔥 CRÍTICA | **Estimativa**: 2-3 dias | **Responsável**: Dev Backend
 
 #### **1.1 Corrigir Função handle_process_recent**
-- [ ] **Arquivo**: `binaries/hiv_discovery_runner/src/main.rs:555-558`
-- [ ] **Problema**: Sintaxe inválida `{{ ... }}`
-- [ ] **Solução**: Corrigir assinatura da função
+- [x] **Arquivo**: `binaries/hiv_discovery_runner/src/main.rs:555-558`
+- [x] **Problema**: Sintaxe inválida `{{ ... }}`
+- [x] **Solução**: Corrigir assinatura da função
 ```rust
 // ❌ Atual (quebrado):
 async fn handle_process_recent(
@@ -51,9 +51,9 @@ async fn handle_process_recent(
 ```
 
 #### **1.2 Corrigir Função is_supported_file**
-- [ ] **Arquivo**: `binaries/hiv_discovery_runner/src/main.rs:564-569`
-- [ ] **Problema**: Código solto fora da função
-- [ ] **Solução**: Mover código para local apropriado
+- [x] **Arquivo**: `binaries/hiv_discovery_runner/src/main.rs:564-569`
+- [x] **Problema**: Código solto fora da função
+- [x] **Solução**: Mover código para local apropriado
 ```rust
 // ❌ Atual (quebrado):
 fn is_supported_file(path: &Path) -> bool {
@@ -64,17 +64,17 @@ fn is_supported_file(path: &Path) -> bool {
 ```
 
 #### **1.3 Verificar Delimitadores**
-- [ ] **Tarefa**: Verificar todos os `{` `}` estão balanceados
-- [ ] **Ferramenta**: `cargo check -p hiv_discovery_runner`
-- [ ] **Critério**: Compilação sem erros
+- [x] **Tarefa**: Verificar todos os `{` `}` estão balanceados
+- [x] **Ferramenta**: `cargo check -p hiv_discovery_runner`
+- [x] **Critério**: Compilação sem erros
 
 ### **2. ⚡ Job Scheduler - Correções Enum**
 **Prioridade**: 🔥 CRÍTICA | **Estimativa**: 1 dia | **Responsável**: Dev Backend
 
 #### **2.1 Corrigir JobStatus Enum**
-- [ ] **Arquivo**: `crates/common/src/job.rs` (presumido)
-- [ ] **Problema**: `JobStatus::Pending` não existe
-- [ ] **Solução**: Adicionar variant faltando
+- [x] **Arquivo**: `crates/common/src/job.rs` (presumido)
+- [x] **Problema**: `JobStatus::Pending` não existe
+- [x] **Solução**: Adicionar variant faltando
 ```rust
 // ✅ Adicionar ao enum:
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::Type)]
@@ -89,22 +89,22 @@ pub enum JobStatus {
 ```
 
 #### **2.2 Atualizar Database Schema**
-- [ ] **Arquivo**: Criar migration SQL
-- [ ] **Comando**: `ALTER TYPE job_status ADD VALUE 'pending';`
-- [ ] **Teste**: Verificar compatibilidade
+- [x] **Arquivo**: Criar migration SQL
+- [x] **Comando**: `ALTER TYPE job_status ADD VALUE 'pending';`
+- [x] **Teste**: Verificar compatibilidade
 
 #### **2.3 Atualizar Referências**
-- [ ] **Buscar**: `JobStatus::Pending` em todo o código
-- [ ] **Verificar**: Todas as referências estão corretas
-- [ ] **Testar**: `cargo test -p job_scheduler`
+- [x] **Buscar**: `JobStatus::Pending` em todo o código
+- [x] **Verificar**: Todas as referências estão corretas
+- [x] **Testar**: `cargo test -p job_scheduler`
 
 ### **3. 👷 Job Worker - Correções Struct**
 **Prioridade**: 🔥 CRÍTICA | **Estimativa**: 1 dia | **Responsável**: Dev Backend
 
 #### **3.1 Completar Struct Job**
-- [ ] **Arquivo**: `crates/common/src/job.rs`
-- [ ] **Problema**: Campos faltando na struct
-- [ ] **Solução**: Adicionar todos os campos necessários
+- [x] **Arquivo**: `crates/common/src/job.rs`
+- [x] **Problema**: Campos faltando na struct
+- [x] **Solução**: Adicionar todos os campos necessários
 ```rust
 // ✅ Struct completa:
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
@@ -125,9 +125,9 @@ pub struct Job {
 ```
 
 #### **3.2 Implementar Traits Necessários**
-- [ ] **Traits**: `Serialize`, `Deserialize`, `sqlx::FromRow`
-- [ ] **Teste**: Verificar serialização JSON
-- [ ] **Validação**: Compatibilidade com PostgreSQL
+- [x] **Traits**: `Serialize`, `Deserialize`, `sqlx::FromRow`
+- [x] **Teste**: Verificar serialização JSON
+- [x] **Validação**: Compatibilidade com PostgreSQL
 
 ### **4. 📞 Job Client - Correções Dependências**
 **Prioridade**: 🔥 CRÍTICA | **Estimativa**: 0.5 dia | **Responsável**: Dev Backend

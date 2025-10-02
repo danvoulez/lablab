@@ -7,12 +7,10 @@ mod mapping;
 mod pipeline;
 mod service;
 mod twin;
+mod triage;
 
-use logline_common::{
-    config::Config,
-    triage::{make_plan_from_json, AnalysisStage, ExecutionPlan},
-    Error, Result,
-};
+use anyhow::{self, Result};
+use logline_common::{triage::make_plan_from_json, Error};
 use std::collections::{HashMap, HashSet};
 use std::fs::{self, File};
 use std::io::{BufRead, BufReader};
@@ -152,6 +150,7 @@ enum Command {
     },
 }
 
+#[derive(Subcommand, Debug)]
 enum LedgerCommand {
     /// Count entries in the ledger
     Status,
@@ -466,6 +465,54 @@ async fn handle_causal(input: PathBuf, output: Option<PathBuf>) -> Result<()> {
     Ok(())
 }
 
+async fn handle_fold_contract(
+    contract_path: PathBuf,
+    output_path: PathBuf,
+    cfg: &RunnerConfig,
+) -> Result<()> {
+    if !contract_path.exists() {
+        return Err(Error::Validation(format!(
+            "Contract file not found: {}",
+            contract_path.display()
+        ))
+        .into());
+    }
+
+    let contract_text = fs::read_to_string(&contract_path)?;
+    let contract = parse_contract(&contract_text);
+    let mut engine = build_demo_engine();
+    let report = engine.execute_contract(&contract);
+
+    if let Some(parent) = output_path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+
+    let summary = summarize_execution_report(&report);
+    fs::write(
+        &output_path,
+        serde_json::to_string_pretty(&summary)?,
+    )?;
+
+    println!(
+        "Executed folding contract {} → {}",
+        contract_path.display(),
+        output_path.display()
+    );
+
+    if cfg.database_url.is_none() {
+        warn!("DATABASE_URL not set; skipping Postgres persistence");
+    }
+    let pool = if let Some(db_url) = &cfg.database_url {
+        Some(Arc::new(init_pool(db_url).await?))
+    } else {
+        None
+    };
+
+    persist_folding_report(&report, &contract_path, &output_path, cfg, pool).await?;
+
+    Ok(())
+}
+
 async fn handle_diagnose(cfg: &RunnerConfig) -> Result<()> {
     println!("LogLine Discovery Lab — Diagnose");
 
@@ -528,7 +575,8 @@ async fn handle_quickstart(output: PathBuf, cfg: &RunnerConfig) -> Result<()> {
         return Err(Error::Validation(format!(
             "Samples directory missing: {}",
             samples_dir.display()
-        )));
+        ))
+        .into());
     }
 
     println!(
@@ -593,7 +641,8 @@ async fn handle_process_recent(
         return Err(Error::Validation(format!(
             "Ledger path missing: {}",
             cfg.ledger_path.display()
-        )));
+        ))
+        .into());
     }
 
     let pool = if let Some(db_url) = &cfg.database_url {
@@ -771,6 +820,12 @@ fn handle_folding_demo() -> Result<()> {
 
     let report = engine.execute_contract(&contract);
 
+    let summary = summarize_execution_report(&report);
+    println!("{}", serde_json::to_string_pretty(&summary)?);
+    Ok(())
+}
+
+fn summarize_execution_report(report: &folding_core::ExecutionReport) -> Value {
     let applied: Vec<_> = report
         .applied_rotations
         .iter()
@@ -823,7 +878,7 @@ fn handle_folding_demo() -> Result<()> {
         .map(|rej| format!("{:?}", rej))
         .collect();
 
-    let summary = json!({
+    json!({
         "final_energy": {
             "potential": report.final_energy.total_potential,
             "kinetic": report.final_energy.total_kinetic,
@@ -842,10 +897,7 @@ fn handle_folding_demo() -> Result<()> {
         "domains": report.domains.len(),
         "chaperones": report.chaperone_requirements.len(),
         "modifications": report.modifications.len(),
-    });
-
-    println!("{}", serde_json::to_string_pretty(&summary)?);
-    Ok(())
+    })
 }
 
 async fn process_span(

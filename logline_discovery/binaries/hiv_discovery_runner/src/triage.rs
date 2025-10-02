@@ -93,7 +93,7 @@ impl TriageEngine {
 
     pub fn make_plan(&self, manifest: &Manifest) -> Result<ExecutionPlan> {
         let mut stages = HashSet::new();
-        let mut metadata = HashMap::new();
+        let metadata = HashMap::new();
 
         for rule in &self.rules {
             if rule.matches(manifest)? {
@@ -107,8 +107,9 @@ impl TriageEngine {
                     } else {
                         // Add stage
                         let stage = AnalysisStage::from(stage_str.as_str());
+                        let stage_label = format!("{:?}", stage);
                         stages.insert(stage);
-                        tracing::info!(stage = %format!("{:?}", stage), "stage_added");
+                        tracing::info!(stage = %stage_label, "stage_added");
                     }
                 }
             }
@@ -187,7 +188,7 @@ impl TriageRule {
     }
 
     fn get_manifest_value(&self, manifest: &Manifest, key: &str) -> Result<String> {
-        match key.as_str() {
+        match key {
             "kind" => Ok(manifest.kind.clone()),
             "qsar_score" => Ok(manifest.qsar_score.map(|v| v.to_string()).unwrap_or_default()),
             "docking_affinity" => Ok(manifest.docking_affinity.map(|v| v.to_string()).unwrap_or_default()),
