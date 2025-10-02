@@ -133,14 +133,14 @@ pub struct Job {
 **Prioridade**: 🔥 CRÍTICA | **Estimativa**: 0.5 dia | **Responsável**: Dev Backend
 
 #### **4.1 Identificar Dependências Faltando**
-- [ ] **Comando**: `cargo check -p job_client`
-- [ ] **Analisar**: Erros de importação
-- [ ] **Listar**: Crates necessários
+- [x] **Comando**: `cargo check -p job_client`
+- [x] **Analisar**: Erros de importação
+- [x] **Listar**: Crates necessários (ajustes aplicados diretamente no cliente para consultas e logs)
 
 #### **4.2 Atualizar Cargo.toml**
-- [ ] **Arquivo**: `binaries/job_client/Cargo.toml`
-- [ ] **Adicionar**: Dependências faltando
-- [ ] **Verificar**: Versões compatíveis
+- [x] **Arquivo**: `binaries/job_client/Cargo.toml`
+- [x] **Adicionar**: Dependências faltando *(nenhuma alteração necessária após verificação)*
+- [x] **Verificar**: Versões compatíveis (compilação `cargo check -p job_client` concluída)
 
 ---
 
