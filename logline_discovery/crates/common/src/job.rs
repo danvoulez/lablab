@@ -5,6 +5,7 @@ use uuid::Uuid;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
 #[sqlx(type_name = "job_status", rename_all = "lowercase")]
 pub enum JobStatus {
+    Pending,
     Queued,
     Running,
     Completed,
@@ -42,7 +43,7 @@ impl Job {
         Self {
             id: Uuid::new_v4(),
             name,
-            status: JobStatus::Queued,
+            status: JobStatus::Pending,
             priority,
             payload,
             created_at: Utc::now(),
@@ -56,7 +57,7 @@ impl Job {
     }
 
     pub fn can_retry(&self) -> bool {
-        self.retry_count < self.max_retries && matches!(self.status, JobStatus::Failed)
+        self.retry_count < self.max_retries
     }
 }
 

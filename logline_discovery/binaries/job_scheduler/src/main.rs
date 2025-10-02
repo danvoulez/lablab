@@ -1,15 +1,10 @@
-use logline_common::{
-    config::Config,
-    job::{Job, JobStatus, JobPriority},
-    Error, Result,
-};
-use chrono::{DateTime, Utc};
+use chrono::{Duration, Utc};
 use clap::Parser;
-use sqlx::{PgPool, Row};
-use std::time::Duration;
-use tokio::time::{interval, sleep};
-use tracing::{info, warn, error};
-use uuid::Uuid;
+use logline_common::{job::Job, Result};
+use sqlx::PgPool;
+use std::time::Duration as StdDuration;
+use tokio::time::interval;
+use tracing::{error, info};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "LogLine Job Queue Scheduler", long_about = None)]
@@ -47,146 +42,111 @@ struct SchedulerConfig {
 impl Scheduler {
     fn new(database_url: String, config: SchedulerConfig) -> Result<Self> {
         let runtime = tokio::runtime::Runtime::new()?;
-        let pool = runtime.block_on(async {
-            PgPool::connect(&database_url).await
-        })?;
+        let pool = runtime.block_on(async { PgPool::connect(&database_url).await })?;
 
         Ok(Self { pool, config })
     }
 
     async fn run(&self) -> Result<()> {
-        info!("Starting job scheduler (interval: {}s, batch: {})",
-              self.config.interval_seconds, self.config.batch_size);
+        info!(
+            "Starting job scheduler (interval: {}s, batch: {})",
+            self.config.interval_seconds, self.config.batch_size
+        );
 
-        let mut interval = interval(Duration::from_secs(self.config.interval_seconds));
+        let mut interval = interval(StdDuration::from_secs(self.config.interval_seconds));
 
         loop {
             interval.tick().await;
 
-            if let Err(e) = self.process_jobs().await {
-                error!("Error processing jobs: {}", e);
+            if let Err(error) = self.process_jobs().await {
+                error!(%error, "scheduler_process_jobs_failed");
             }
 
-            if let Err(e) = self.cleanup_stuck_jobs().await {
-                error!("Error cleaning up stuck jobs: {}", e);
+            if let Err(error) = self.cleanup_stuck_jobs().await {
+                error!(%error, "scheduler_cleanup_failed");
             }
         }
     }
 
     async fn process_jobs(&self) -> Result<()> {
-        // Use SELECT FOR UPDATE SKIP LOCKED to atomically get and lock jobs
-        let jobs: Vec<Job> = sqlx::query_as(
+        let pending_jobs: Vec<Job> = sqlx::query_as::<_, Job>(
             r#"
             SELECT id, name, status as "status: JobStatus", priority as "priority: JobPriority",
                    payload, created_at, started_at, completed_at, worker_id, error_message,
                    retry_count, max_retries
             FROM jobs
-            WHERE status = 'queued'
+            WHERE status = 'pending'
             ORDER BY priority DESC, created_at ASC
             LIMIT $1
-            FOR UPDATE SKIP LOCKED
-            "#
+            "#,
         )
-        .bind(self.config.batch_size as i32)
+        .bind(self.config.batch_size as i64)
         .fetch_all(&self.pool)
         .await?;
 
-        for mut job in jobs {
+        for job in &pending_jobs {
+            sqlx::query(
+                r#"
+                UPDATE jobs
+                SET status = 'queued', started_at = NULL, worker_id = NULL
+                WHERE id = $1
+                "#,
+            )
+            .bind(job.id)
+            .execute(&self.pool)
+            .await?;
 
-            // Mark job as running
-            job.status = JobStatus::Running;
-            job.started_at = Some(Utc::now());
-
-            // Record job execution
-        let execution = JobExecution {
-            job_id: job.id,
-            worker_id: job.worker_id,
-            started_at: job.started_at,
-            completed_at: None,
-            success: None,
-            error_message: None,
-            metrics: None,
-        };
-
-        sqlx::query(
-            r#"
-            INSERT INTO job_executions (job_id, worker_id, started_at, completed_at, success, error_message, metrics)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            "#
-        )
-        .bind(&execution.job_id)
-        .bind(&execution.worker_id)
-        .bind(&execution.started_at)
-        .bind(&execution.completed_at)
-        .bind(&execution.success)
-        .bind(&execution.error_message)
-        .bind(&execution.metrics)
-        .execute(&self.pool)
-        .await?;
-
-            // Notify workers that a job is available
             sqlx::query("NOTIFY job_available")
                 .execute(&self.pool)
                 .await?;
-{{ ... }}
-            info!("Job {} marked as running", job.id);
+
+            info!(job_id = %job.id, job_name = %job.name, "job_queued");
         }
 
-        if !jobs.is_empty() {
-            info!("Processed {} jobs in this cycle", jobs.len());
+        if !pending_jobs.is_empty() {
+            info!("Queued {} jobs in this cycle", pending_jobs.len());
         }
 
         Ok(())
     }
 
     async fn cleanup_stuck_jobs(&self) -> Result<()> {
-        let timeout_threshold = Utc::now() - chrono::Duration::minutes(self.config.worker_timeout_minutes as i64);
+        let timeout_threshold =
+            Utc::now() - Duration::minutes(self.config.worker_timeout_minutes as i64);
 
-        // Find stuck jobs (running but past timeout)
-        let stuck_jobs: Vec<Job> = sqlx::query_as!(
-            Job,
+        let stuck_jobs: Vec<Job> = sqlx::query_as::<_, Job>(
             r#"
-            SELECT id, name, payload, status as "status: JobStatus", 
-                   created_at, started_at, completed_at, worker_id
+            SELECT id, name, status as "status: JobStatus", priority as "priority: JobPriority",
+                   payload, created_at, started_at, completed_at, worker_id, error_message,
+                   retry_count, max_retries
             FROM jobs
             WHERE status = 'running'
-            AND started_at < $1
-            FOR UPDATE
+              AND started_at < $1
             "#,
-            timeout_threshold
         )
+        .bind(timeout_threshold)
         .fetch_all(&self.pool)
         .await?;
 
-        for mut job in stuck_jobs {
-            info!("Cleaning up stuck job {} ({})", job.id, job.name);
-
-            // Mark job as pending to retry
-            job.status = JobStatus::Pending;
-            job.started_at = None;
-            job.worker_id = None;
-
-            // Update job in database
-            sqlx::query!(
+        for job in &stuck_jobs {
+            sqlx::query(
                 r#"
                 UPDATE jobs
-                SET status = $1, started_at = $2, worker_id = $3
-                WHERE id = $4
+                SET status = 'pending', started_at = NULL, worker_id = NULL
+                WHERE id = $1
                 "#,
-                job.status as JobStatus,
-                job.started_at,
-                job.worker_id,
-                job.id
             )
+            .bind(job.id)
             .execute(&self.pool)
             .await?;
 
-            info!("Job {} reset to pending", job.id);
+            info!(job_id = %job.id, job_name = %job.name, "job_reset_to_pending");
         }
 
         if !stuck_jobs.is_empty() {
-            info!("Cleaned up {} stuck jobs", stuck_jobs.len());
+            info!("Reset {} stuck jobs", stuck_jobs.len());
         }
+
         Ok(())
     }
 }
