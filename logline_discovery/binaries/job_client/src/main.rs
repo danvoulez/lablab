@@ -1,9 +1,9 @@
+use chrono::{DateTime, Utc};
+use clap::{Parser, Subcommand};
 use logline_common::{
     job::{Job, JobPriority},
-    Error, Result,
+    Result,
 };
-use chrono::Utc;
-use clap::{Parser, Subcommand};
 use serde_json::{json, Value};
 use sqlx::PgPool;
 use tracing::{info, warn};
@@ -80,6 +80,15 @@ enum Command {
     },
 }
 
+#[derive(Debug, sqlx::FromRow)]
+struct WorkerMetrics {
+    worker_id: String,
+    total_jobs: i64,
+    successful_jobs: i64,
+    failed_jobs: i64,
+    last_activity: Option<DateTime<Utc>>,
+}
+
 #[derive(Debug)]
 struct JobClient {
     pool: PgPool,
@@ -88,9 +97,7 @@ struct JobClient {
 impl JobClient {
     fn new(database_url: String) -> Result<Self> {
         let runtime = tokio::runtime::Runtime::new()?;
-        let pool = runtime.block_on(async {
-            PgPool::connect(&database_url).await
-        })?;
+        let pool = runtime.block_on(async { PgPool::connect(&database_url).await })?;
 
         Ok(Self { pool })
     }
@@ -126,12 +133,19 @@ impl JobClient {
             .execute(&self.pool)
             .await?;
 
-        info!("Submitted job {} ({})", job.id, job.name);
+        info!(
+            job_id = %job.id,
+            job_name = %job.name,
+            job_type = %job_type,
+            "Submitted job"
+        );
         Ok(job.id)
     }
 
     async fn list_jobs(&self, status: Option<String>, limit: u32) -> Result<()> {
-        let status_filter = status.as_ref().map(|s| format!("AND status = '{}'", s))
+        let status_filter = status
+            .as_ref()
+            .map(|s| format!("AND status = '{}'", s))
             .unwrap_or_default();
 
         let jobs: Vec<Job> = sqlx::query_as(&format!(
@@ -154,11 +168,15 @@ impl JobClient {
             return Ok(());
         }
 
-        println!("{:<36} {:<20} {:<10} {:<20} {}", "JOB ID", "NAME", "STATUS", "PRIORITY", "CREATED");
+        println!(
+            "{:<36} {:<20} {:<10} {:<20} {}",
+            "JOB ID", "NAME", "STATUS", "PRIORITY", "CREATED"
+        );
         println!("{}", "-".repeat(100));
 
         for job in jobs {
-            println!("{:<36} {:<20} {:<10} {:<20} {}",
+            println!(
+                "{:<36} {:<20} {:<10} {:<20} {}",
                 job.id,
                 job.name.chars().take(20).collect::<String>(),
                 format!("{:?}", job.status),
@@ -177,7 +195,7 @@ impl JobClient {
                    payload, created_at, started_at, completed_at, worker_id, error_message,
                    retry_count, max_retries
             FROM jobs WHERE id = $1
-            "#
+            "#,
         )
         .bind(&job_id)
         .fetch_optional(&self.pool)
@@ -217,7 +235,7 @@ impl JobClient {
             UPDATE jobs
             SET status = 'cancelled', completed_at = NOW()
             WHERE id = $1 AND status = 'queued'
-            "#
+            "#,
         )
         .bind(&job_id)
         .execute(&self.pool)
@@ -234,7 +252,7 @@ impl JobClient {
     }
 
     async fn show_worker_status(&self, detailed: bool) -> Result<()> {
-        let workers: Vec<(String, i64, i64, i64, Option<String>)> = sqlx::query_as(
+        let workers: Vec<WorkerMetrics> = sqlx::query_as::<_, WorkerMetrics>(
             r#"
             SELECT
                 worker_id,
@@ -246,7 +264,7 @@ impl JobClient {
             WHERE completed_at > NOW() - INTERVAL '1 hour'
             GROUP BY worker_id
             ORDER BY last_activity DESC NULLS LAST
-            "#
+            "#,
         )
         .fetch_all(&self.pool)
         .await?;
@@ -257,20 +275,30 @@ impl JobClient {
         }
 
         if detailed {
-            println!("{:<15} {:<10} {:<10} {:<10} {}", "WORKER", "TOTAL", "SUCCESS", "FAILED", "LAST ACTIVITY");
+            println!(
+                "{:<15} {:<10} {:<10} {:<10} {}",
+                "WORKER", "TOTAL", "SUCCESS", "FAILED", "LAST ACTIVITY"
+            );
             println!("{}", "-".repeat(70));
 
-            for (worker_id, total, success, failed, last_activity) in workers {
-                println!("{:<15} {:<10} {:<10} {:<10} {}",
-                    worker_id.chars().take(15).collect::<String>(),
-                    total, success, failed,
-                    last_activity.map(|t| t.format("%H:%M:%S").to_string()).unwrap_or_else(|| "Never".to_string())
+            for worker in &workers {
+                println!(
+                    "{:<15} {:<10} {:<10} {:<10} {}",
+                    worker.worker_id.chars().take(15).collect::<String>(),
+                    worker.total_jobs,
+                    worker.successful_jobs,
+                    worker.failed_jobs,
+                    worker
+                        .last_activity
+                        .as_ref()
+                        .map(|t| t.format("%H:%M:%S").to_string())
+                        .unwrap_or_else(|| "Never".to_string())
                 );
             }
         } else {
             println!("Active workers:");
-            for (worker_id, _, _, _, _) in workers {
-                println!("  • {}", worker_id);
+            for worker in workers {
+                println!("  • {}", worker.worker_id);
             }
         }
 
@@ -286,7 +314,14 @@ async fn main() -> Result<()> {
     let client = JobClient::new(cli.database_url)?;
 
     match cli.command {
-        Command::Submit { name, job_type, priority, payload, span_id, execution_span } => {
+        Command::Submit {
+            name,
+            job_type,
+            priority,
+            payload,
+            span_id,
+            execution_span,
+        } => {
             let priority = match priority.as_str() {
                 "low" => JobPriority::Low,
                 "normal" => JobPriority::Normal,
@@ -317,7 +352,9 @@ async fn main() -> Result<()> {
                 });
             }
 
-            let job_id = client.submit_job(name, job_type, priority, job_payload).await?;
+            let job_id = client
+                .submit_job(name, job_type, priority, job_payload)
+                .await?;
             println!("Submitted job: {}", job_id);
         }
 

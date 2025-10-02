@@ -1,8 +1,6 @@
 use anyhow::Result;
-use serde_json::Value;
 use spans_core::UniversalSpan;
-use std::collections::HashMap;
-use tracing::{info, warn, error};
+use tracing::{error, info, warn};
 
 use crate::triage::{AnalysisStage, ExecutionPlan, TriageEngine};
 
