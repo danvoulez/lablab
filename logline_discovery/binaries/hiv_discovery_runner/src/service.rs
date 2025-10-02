@@ -105,6 +105,29 @@ async fn execution_causal(
     Ok(Json(chains))
 }
 
+async fn execution_twin(
+    State(state): State<AppState>,
+    Path(execution_id): Path<String>,
+) -> Result<Json<TwinSummary>, AppError> {
+    let spans = state.ledger.spans().await.map_err(AppError::from)?;
+    let matching = spans_for_execution(&spans, &execution_id);
+    if matching.is_empty() {
+        return Err(AppError::not_found(format!(
+            "execution span {} not found",
+            execution_id
+        )));
+    }
+
+    let summary = build_twin_summary(&spans, &execution_id).ok_or_else(|| {
+        AppError::not_found(format!(
+            "no twin telemetry available for execution {}",
+            execution_id
+        ))
+    })?;
+
+    Ok(Json(summary))
+}
+
 async fn all_twin_observations(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<TwinObservationSummary>>, AppError> {

@@ -1,15 +1,13 @@
+use chrono::Utc;
+use clap::Parser;
 use logline_common::{
-    config::Config,
-    job::{Job, JobStatus, JobExecution},
+    job::{Job, JobExecution},
     Error, Result,
 };
-use chrono::{DateTime, Utc};
-use clap::Parser;
-use sqlx::{PgPool, PgListener, PgConnection};
-use std::collections::HashMap;
+use sqlx::{postgres::PgListener, PgPool};
 use std::time::Duration;
-use tokio::time::{timeout, sleep};
-use tracing::{info, warn, error};
+use tokio::time::{sleep, timeout};
+use tracing::{error, info, warn};
 use uuid::Uuid;
 
 #[derive(Parser, Debug)]
@@ -57,9 +55,7 @@ struct WorkerMetrics {
 impl Worker {
     fn new(database_url: String, worker_id: String, config: WorkerConfig) -> Result<Self> {
         let runtime = tokio::runtime::Runtime::new()?;
-        let pool = runtime.block_on(async {
-            PgPool::connect(&database_url).await
-        })?;
+        let pool = runtime.block_on(async { PgPool::connect(&database_url).await })?;
 
         Ok(Self {
             pool,
@@ -70,8 +66,10 @@ impl Worker {
     }
 
     async fn run(&mut self) -> Result<()> {
-        info!("Starting job worker {} (timeout: {}min, poll: {}s)",
-              self.worker_id, self.config.job_timeout_minutes, self.config.poll_interval_seconds);
+        info!(
+            "Starting job worker {} (timeout: {}min, poll: {}s)",
+            self.worker_id, self.config.job_timeout_minutes, self.config.poll_interval_seconds
+        );
 
         // Set up PostgreSQL listener for job notifications
         let mut listener = PgListener::connect_with(&self.pool).await?;
@@ -83,19 +81,24 @@ impl Worker {
                 Ok(Some(mut job)) => {
                     let start_time = std::time::Instant::now();
 
-                    match self.process_job(&mut job).await {
+                    let result = self.process_job(&mut job).await;
+                    let elapsed = start_time.elapsed();
+
+                    match result {
                         Ok(_) => {
-                            self.record_job_success(&job, start_time.elapsed()).await?;
+                            self.record_job_success(&job, elapsed).await?;
                             self.metrics.jobs_succeeded += 1;
                         }
                         Err(e) => {
-                            self.record_job_failure(&job, &e.to_string(), start_time.elapsed()).await?;
+                            self.record_job_failure(&job, &e.to_string(), elapsed)
+                                .await?;
                             self.metrics.jobs_failed += 1;
                         }
                     }
 
+                    self.metrics.total_processing_time_ms += elapsed.as_millis() as u64;
                     self.metrics.jobs_processed += 1;
-                    self.log_metrics().await;
+                    self.log_metrics();
                 }
                 Ok(None) => {
                     // No jobs available, wait for notification or poll
@@ -135,7 +138,7 @@ impl Worker {
             RETURNING id, name, status as "status: JobStatus", priority as "priority: JobPriority",
                       payload, created_at, started_at, completed_at, worker_id, error_message,
                       retry_count, max_retries
-            "#
+            "#,
         )
         .bind(&self.worker_id)
         .fetch_optional(&self.pool)
@@ -152,10 +155,10 @@ impl Worker {
 
         match timeout(timeout_duration, self.execute_job(job)).await {
             Ok(result) => result,
-            Err(_) => {
-                Err(Error::JobQueue(format!("Job {} timed out after {} minutes",
-                    job.id, self.config.job_timeout_minutes)))
-            }
+            Err(_) => Err(Error::JobQueue(format!(
+                "Job {} timed out after {} minutes",
+                job.id, self.config.job_timeout_minutes
+            ))),
         }
     }
 
@@ -166,15 +169,9 @@ impl Worker {
         let payload: serde_json::Value = job.payload.clone();
 
         match payload.get("type").and_then(|t| t.as_str()) {
-            Some("span_processing") => {
-                self.process_span_job(job, payload).await
-            }
-            Some("manuscript_generation") => {
-                self.process_manuscript_job(job, payload).await
-            }
-            Some("twin_analysis") => {
-                self.process_twin_analysis_job(job, payload).await
-            }
+            Some("span_processing") => self.process_span_job(job, payload).await,
+            Some("manuscript_generation") => self.process_manuscript_job(job, payload).await,
+            Some("twin_analysis") => self.process_twin_analysis_job(job, payload).await,
             _ => {
                 // Generic job processing
                 info!("Processing generic job {}", job.id);
@@ -184,7 +181,7 @@ impl Worker {
         }
     }
 
-    async fn process_span_job(&self, job: &mut Job, payload: serde_json::Value) -> Result<()> {
+    async fn process_span_job(&self, job: &mut Job, _payload: serde_json::Value) -> Result<()> {
         info!("Processing span job {}", job.id);
 
         // Simulate span processing work
@@ -199,7 +196,11 @@ impl Worker {
         Ok(())
     }
 
-    async fn process_manuscript_job(&self, job: &mut Job, payload: serde_json::Value) -> Result<()> {
+    async fn process_manuscript_job(
+        &self,
+        job: &mut Job,
+        _payload: serde_json::Value,
+    ) -> Result<()> {
         info!("Processing manuscript job {}", job.id);
 
         // Simulate manuscript generation
@@ -208,7 +209,11 @@ impl Worker {
         Ok(())
     }
 
-    async fn process_twin_analysis_job(&self, job: &mut Job, payload: serde_json::Value) -> Result<()> {
+    async fn process_twin_analysis_job(
+        &self,
+        job: &mut Job,
+        _payload: serde_json::Value,
+    ) -> Result<()> {
         info!("Processing twin analysis job {}", job.id);
 
         // Simulate twin analysis
@@ -219,6 +224,7 @@ impl Worker {
 
     async fn record_job_success(&self, job: &Job, duration: Duration) -> Result<()> {
         let execution = JobExecution {
+            id: Uuid::new_v4(),
             job_id: job.id,
             worker_id: self.worker_id.clone(),
             started_at: job.started_at.unwrap_or_else(Utc::now),
@@ -230,40 +236,50 @@ impl Worker {
             }),
         };
 
-        // Record job execution
         sqlx::query(
             r#"
-            INSERT INTO job_executions (job_id, worker_id, started_at, completed_at, success, metrics)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO job_executions (id, job_id, worker_id, started_at, completed_at, success, error_message, metrics)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             "#
         )
-        .bind(&execution.job_id)
-        .bind(&execution.worker_id)
-        .bind(&execution.started_at)
-        .bind(&execution.completed_at)
-        .bind(&execution.success)
-        .bind(&execution.metrics)
+        .bind(execution.id)
+        .bind(execution.job_id)
+        .bind(execution.worker_id.clone())
+        .bind(execution.started_at)
+        .bind(execution.completed_at)
+        .bind(execution.success)
+        .bind(execution.error_message.clone())
+        .bind(execution.metrics.clone())
         .execute(&self.pool)
         .await?;
 
-        // Mark job as completed
         sqlx::query(
             r#"
             UPDATE jobs
-            SET status = 'completed', completed_at = NOW()
+            SET status = 'completed', completed_at = NOW(), error_message = NULL
             WHERE id = $1
-            "#
+            "#,
         )
-        .bind(&job.id)
+        .bind(job.id)
         .execute(&self.pool)
         .await?;
 
-        info!("Job {} completed successfully (took {}ms)", job.id, duration.as_millis());
+        info!(
+            "Job {} completed successfully (took {}ms)",
+            job.id,
+            duration.as_millis()
+        );
         Ok(())
     }
 
-    async fn record_job_failure(&self, job: &Job, error_msg: &str, duration: Duration) -> Result<()> {
+    async fn record_job_failure(
+        &self,
+        job: &Job,
+        error_msg: &str,
+        duration: Duration,
+    ) -> Result<()> {
         let execution = JobExecution {
+            id: Uuid::new_v4(),
             job_id: job.id,
             worker_id: self.worker_id.clone(),
             started_at: job.started_at.unwrap_or_else(Utc::now),
@@ -275,69 +291,79 @@ impl Worker {
             }),
         };
 
-        // Record job execution
         sqlx::query(
             r#"
-            INSERT INTO job_executions (job_id, worker_id, started_at, completed_at, success, error_message, metrics)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO job_executions (id, job_id, worker_id, started_at, completed_at, success, error_message, metrics)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             "#
         )
-        .bind(&execution.job_id)
-        .bind(&execution.worker_id)
-        .bind(&execution.started_at)
-        .bind(&execution.completed_at)
-        .bind(&execution.success)
-        .bind(&execution.error_message)
-        .bind(&execution.metrics)
+        .bind(execution.id)
+        .bind(execution.job_id)
+        .bind(execution.worker_id.clone())
+        .bind(execution.started_at)
+        .bind(execution.completed_at)
+        .bind(execution.success)
+        .bind(execution.error_message.clone())
+        .bind(execution.metrics.clone())
         .execute(&self.pool)
         .await?;
 
-        // Handle job failure with retry logic
         if job.can_retry() {
             sqlx::query(
                 r#"
                 UPDATE jobs
-                SET status = 'queued', started_at = NULL, worker_id = NULL,
+                SET status = 'pending', started_at = NULL, worker_id = NULL,
                     retry_count = retry_count + 1, error_message = $2
                 WHERE id = $1
-                "#
+                "#,
             )
-            .bind(&job.id)
+            .bind(job.id)
             .bind(error_msg)
             .execute(&self.pool)
             .await?;
 
-            info!("Job {} failed, queued for retry (attempt {})", job.id, job.retry_count + 1);
+            info!(
+                "Job {} failed, queued for retry (attempt {})",
+                job.id,
+                job.retry_count + 1
+            );
         } else {
             sqlx::query(
                 r#"
                 UPDATE jobs
                 SET status = 'failed', completed_at = NOW(), error_message = $2
                 WHERE id = $1
-                "#
+                "#,
             )
-            .bind(&job.id)
+            .bind(job.id)
             .bind(error_msg)
             .execute(&self.pool)
             .await?;
 
-            info!("Job {} failed permanently after {} attempts", job.id, job.max_retries);
+            info!(
+                "Job {} failed permanently after {} attempts",
+                job.id, job.max_retries
+            );
         }
 
         Ok(())
     }
 
-    async fn log_metrics(&self) {
-        info!("Worker {} metrics: processed={}, succeeded={}, failed={}, avg_time={}ms",
-              self.worker_id,
-              self.metrics.jobs_processed,
-              self.metrics.jobs_succeeded,
-              self.metrics.jobs_failed,
-              if self.metrics.jobs_processed > 0 {
-                  self.metrics.total_processing_time_ms / self.metrics.jobs_processed
-              } else {
-                  0
-              });
+    fn log_metrics(&self) {
+        let average_time = if self.metrics.jobs_processed > 0 {
+            self.metrics.total_processing_time_ms / self.metrics.jobs_processed
+        } else {
+            0
+        };
+
+        info!(
+            "Worker {} metrics: processed={}, succeeded={}, failed={}, avg_time={}ms",
+            self.worker_id,
+            self.metrics.jobs_processed,
+            self.metrics.jobs_succeeded,
+            self.metrics.jobs_failed,
+            average_time
+        );
     }
 }
 

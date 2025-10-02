@@ -18,6 +18,7 @@ folding_molecule = { path = "../../crates/molecule" }
 folding_time = { path = "../../crates/time" }
 warp_common = { path = "../../crates/warp_common" }
 warp_ledger_vault = { path = "../../crates/warp_ledger_vault" }
+folding_core = { path = "../../crates/core" }
 
 # Workspace dependencies
 anyhow = { workspace = true }
