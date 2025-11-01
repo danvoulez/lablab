@@ -59,11 +59,12 @@ docker run -it --rm rust:latest bash
 git clone https://github.com/danvoulez/lablab.git
 cd lablab
 
-# Testar cada exemplo:
-./examples/01_gp41_basic.sh
-./examples/02_dashboard_demo.sh
-./examples/03_slack_integration.sh
-./examples/04_manuscript_generation.sh
+# Testar cada exemplo (use caminho relativo):
+cd examples
+./01_gp41_basic.sh
+./02_dashboard_demo.sh
+./03_slack_integration.sh
+./04_manuscript_generation.sh
 ```
 
 **Documentar problemas**:
