@@ -6,6 +6,8 @@
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0--partial-green.svg)](releases/)
 
+> 💡 **Novo desenvolvedor?** Comece pelo [Resumo Executivo](EXECUTIVE_SUMMARY.md) para entender o produto e próximos passos estratégicos!
+
 ## 🎯 Visão Geral
 
 O LogLine Discovery Lab é um **laboratório farmacêutico computacional** focado em descoberta de medicamentos para **HIV**, com ênfase em:
@@ -154,10 +156,18 @@ cargo clippy --fix
 
 ## 📚 Documentação
 
-- [📋 Changelog](CHANGELOG.md)
-- [🔧 Setup Guide](docs/setup.md)
-- [📡 API Documentation](docs/api.md)
-- [📱 Slack Integration](SLACK_SETUP.md)
+### 🎯 Estratégia e Planejamento (NOVO!)
+- [🎯 **Resumo Executivo**](EXECUTIVE_SUMMARY.md) - Comece aqui! Visão geral e próximos passos
+- [🚀 **Roadmap Estratégico**](STRATEGIC_ROADMAP.md) - 3 caminhos de produto + análise detalhada
+- [📋 **Plano de Ação 30 Dias**](ACTION_PLAN.md) - Checklist executável passo-a-passo
+- [📄 **Quick Reference**](QUICK_REFERENCE.md) - Cartão de referência rápida (imprima!)
+
+### 📖 Documentação Técnica
+- [📋 Changelog](logline_discovery/CHANGELOG.md)
+- [🔧 Setup Guide](docs/setup_postgres.md)
+- [📡 Master Plan](docs/master_plan.md)
+- [📱 Slack Integration](logline_discovery/SLACK_SETUP.md)
+- [📊 Task List](TASKLIST.md)
 
 ## 📄 Licença
 
