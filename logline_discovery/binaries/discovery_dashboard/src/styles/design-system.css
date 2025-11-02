@@ -1,0 +1,569 @@
+/*
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  LogLine Discovery Lab - Design System                       ║
+  ║  A comprehensive design token system for jaw-dropping UI/UX  ║
+  ╚══════════════════════════════════════════════════════════════╝
+*/
+
+:root {
+  /* ============================================
+     COLOR PALETTE - Modern Scientific Theme
+     ============================================ */
+
+  /* Primary Colors - Deep Space Gradient */
+  --color-primary-50: #e6f0ff;
+  --color-primary-100: #cce0ff;
+  --color-primary-200: #99c2ff;
+  --color-primary-300: #66a3ff;
+  --color-primary-400: #3385ff;
+  --color-primary-500: #0066ff;
+  --color-primary-600: #0052cc;
+  --color-primary-700: #003d99;
+  --color-primary-800: #002966;
+  --color-primary-900: #001433;
+
+  /* Cyan Accent - Quantum Glow */
+  --color-cyan-50: #e6fbff;
+  --color-cyan-100: #ccf7ff;
+  --color-cyan-200: #99efff;
+  --color-cyan-300: #66e7ff;
+  --color-cyan-400: #33dfff;
+  --color-cyan-500: #00d4ff;
+  --color-cyan-600: #00a8cc;
+  --color-cyan-700: #007d99;
+  --color-cyan-800: #005366;
+  --color-cyan-900: #002933;
+
+  /* Purple Accent - Neural Network */
+  --color-purple-50: #f3e6ff;
+  --color-purple-100: #e6ccff;
+  --color-purple-200: #cc99ff;
+  --color-purple-300: #b366ff;
+  --color-purple-400: #9933ff;
+  --color-purple-500: #8000ff;
+  --color-purple-600: #6600cc;
+  --color-purple-700: #4d0099;
+  --color-purple-800: #330066;
+  --color-purple-900: #1a0033;
+
+  /* Semantic Colors */
+  --color-success-light: #00f2c3;
+  --color-success: #00d9a8;
+  --color-success-dark: #00a67f;
+
+  --color-warning-light: #ffd93d;
+  --color-warning: #ffc107;
+  --color-warning-dark: #f89800;
+
+  --color-error-light: #ff6b6b;
+  --color-error: #dc3545;
+  --color-error-dark: #b32837;
+
+  --color-info-light: #4dd4ff;
+  --color-info: #17a2b8;
+  --color-info-dark: #117a8b;
+
+  /* Neutral Colors - Dark Theme Base */
+  --color-background-darker: #06080f;
+  --color-background-dark: #0a0e1a;
+  --color-background-base: #0c1021;
+  --color-background-elevated: #141829;
+  --color-background-elevated-hover: #1a1f3a;
+  --color-background-elevated-active: #22284a;
+
+  --color-surface-base: #1a1f3a;
+  --color-surface-hover: #22284a;
+  --color-surface-active: #2a315a;
+
+  --color-text-primary: #f6f7fb;
+  --color-text-secondary: #b8bcc8;
+  --color-text-tertiary: #8b90a0;
+  --color-text-disabled: #5a5e6e;
+  --color-text-inverse: #0c1021;
+
+  /* Border Colors */
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-base: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
+  --color-border-glow: rgba(0, 212, 255, 0.3);
+
+  /* Overlay Colors */
+  --color-overlay-base: rgba(6, 8, 15, 0.6);
+  --color-overlay-strong: rgba(6, 8, 15, 0.85);
+  --color-overlay-light: rgba(255, 255, 255, 0.05);
+
+  /* Gradient Definitions */
+  --gradient-primary: linear-gradient(135deg, #0c1021 0%, #1a1f3a 100%);
+  --gradient-primary-vibrant: linear-gradient(135deg, #0c1021 0%, #22284a 100%);
+  --gradient-cyan-glow: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%);
+  --gradient-purple-glow: linear-gradient(135deg, #8000ff 0%, #00d4ff 100%);
+  --gradient-success: linear-gradient(135deg, #00f2c3 0%, #00d9a8 100%);
+  --gradient-warning: linear-gradient(135deg, #ffd93d 0%, #ffc107 100%);
+  --gradient-error: linear-gradient(135deg, #ff6b6b 0%, #dc3545 100%);
+
+  /* Radial Gradients for Effects */
+  --gradient-radial-cyan: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
+  --gradient-radial-purple: radial-gradient(circle at 50% 50%, rgba(128, 0, 255, 0.12) 0%, transparent 70%);
+
+  /* ============================================
+     TYPOGRAPHY SYSTEM
+     ============================================ */
+
+  /* Font Families */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-family-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-mono: 'Fira Code', 'Monaco', 'Consolas', 'Courier New', monospace;
+
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;      /* 12px */
+  --font-size-sm: 0.875rem;     /* 14px */
+  --font-size-base: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;     /* 18px */
+  --font-size-xl: 1.25rem;      /* 20px */
+  --font-size-2xl: 1.5rem;      /* 24px */
+  --font-size-3xl: 1.875rem;    /* 30px */
+  --font-size-4xl: 2.25rem;     /* 36px */
+  --font-size-5xl: 3rem;        /* 48px */
+  --font-size-6xl: 3.75rem;     /* 60px */
+
+  /* Font Weights */
+  --font-weight-thin: 100;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+
+  /* ============================================
+     SPACING SYSTEM (8px base)
+     ============================================ */
+
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+  --space-32: 8rem;     /* 128px */
+
+  /* ============================================
+     SIZING SYSTEM
+     ============================================ */
+
+  --size-xs: 20rem;     /* 320px */
+  --size-sm: 24rem;     /* 384px */
+  --size-md: 28rem;     /* 448px */
+  --size-lg: 32rem;     /* 512px */
+  --size-xl: 36rem;     /* 576px */
+  --size-2xl: 42rem;    /* 672px */
+  --size-3xl: 48rem;    /* 768px */
+  --size-4xl: 56rem;    /* 896px */
+  --size-5xl: 64rem;    /* 1024px */
+  --size-6xl: 72rem;    /* 1152px */
+  --size-7xl: 80rem;    /* 1280px */
+  --size-full: 100%;
+
+  /* ============================================
+     BORDER RADIUS
+     ============================================ */
+
+  --radius-none: 0;
+  --radius-sm: 0.25rem;     /* 4px */
+  --radius-base: 0.5rem;    /* 8px */
+  --radius-md: 0.75rem;     /* 12px */
+  --radius-lg: 1rem;        /* 16px */
+  --radius-xl: 1.5rem;      /* 24px */
+  --radius-2xl: 2rem;       /* 32px */
+  --radius-full: 9999px;
+
+  /* ============================================
+     SHADOWS - Elevation System
+     ============================================ */
+
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  --shadow-2xl: 0 50px 100px -20px rgba(0, 0, 0, 0.8);
+
+  /* Glow Shadows */
+  --shadow-glow-cyan: 0 0 20px rgba(0, 212, 255, 0.4), 0 0 40px rgba(0, 212, 255, 0.2);
+  --shadow-glow-purple: 0 0 20px rgba(128, 0, 255, 0.4), 0 0 40px rgba(128, 0, 255, 0.2);
+  --shadow-glow-success: 0 0 20px rgba(0, 217, 168, 0.4), 0 0 40px rgba(0, 217, 168, 0.2);
+  --shadow-glow-warning: 0 0 20px rgba(255, 193, 7, 0.4), 0 0 40px rgba(255, 193, 7, 0.2);
+  --shadow-glow-error: 0 0 20px rgba(220, 53, 69, 0.4), 0 0 40px rgba(220, 53, 69, 0.2);
+
+  /* Inner Shadows */
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+  --shadow-inner-lg: inset 0 4px 8px 0 rgba(0, 0, 0, 0.4);
+
+  /* ============================================
+     Z-INDEX SYSTEM
+     ============================================ */
+
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-notification: 1080;
+
+  /* ============================================
+     TRANSITIONS & ANIMATIONS
+     ============================================ */
+
+  /* Duration */
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-moderate: 300ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+  --duration-slowest: 1000ms;
+
+  /* Easing Functions */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* Common Transitions */
+  --transition-fast: all var(--duration-fast) var(--ease-out);
+  --transition-base: all var(--duration-base) var(--ease-in-out);
+  --transition-moderate: all var(--duration-moderate) var(--ease-in-out);
+  --transition-colors: color var(--duration-base) var(--ease-in-out),
+                       background-color var(--duration-base) var(--ease-in-out),
+                       border-color var(--duration-base) var(--ease-in-out);
+  --transition-transform: transform var(--duration-base) var(--ease-out);
+  --transition-opacity: opacity var(--duration-base) var(--ease-in-out);
+
+  /* ============================================
+     BLUR & BACKDROP EFFECTS
+     ============================================ */
+
+  --blur-none: 0;
+  --blur-sm: 4px;
+  --blur-base: 8px;
+  --blur-md: 12px;
+  --blur-lg: 16px;
+  --blur-xl: 24px;
+  --blur-2xl: 40px;
+  --blur-3xl: 64px;
+
+  /* Glassmorphism Presets */
+  --glass-subtle: rgba(255, 255, 255, 0.05);
+  --glass-base: rgba(255, 255, 255, 0.08);
+  --glass-strong: rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================
+   GLOBAL RESETS & BASE STYLES
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background: var(--gradient-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Text Utilities */
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary { color: var(--color-text-tertiary); }
+.text-cyan { color: var(--color-cyan-500); }
+.text-purple { color: var(--color-purple-500); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+
+/* Background Utilities */
+.bg-elevated { background-color: var(--color-background-elevated); }
+.bg-surface { background-color: var(--color-surface-base); }
+.bg-gradient-primary { background: var(--gradient-primary); }
+.bg-gradient-vibrant { background: var(--gradient-primary-vibrant); }
+
+/* Glassmorphism Effect */
+.glass {
+  background: var(--glass-base);
+  backdrop-filter: blur(var(--blur-lg));
+  -webkit-backdrop-filter: blur(var(--blur-lg));
+  border: 1px solid var(--color-border-subtle);
+}
+
+.glass-strong {
+  background: var(--glass-strong);
+  backdrop-filter: blur(var(--blur-xl));
+  -webkit-backdrop-filter: blur(var(--blur-xl));
+  border: 1px solid var(--color-border-base);
+}
+
+/* Glow Effects */
+.glow-cyan {
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.glow-purple {
+  box-shadow: var(--shadow-glow-purple);
+}
+
+.glow-success {
+  box-shadow: var(--shadow-glow-success);
+}
+
+/* Elevation Shadows */
+.elevation-sm { box-shadow: var(--shadow-sm); }
+.elevation-base { box-shadow: var(--shadow-base); }
+.elevation-md { box-shadow: var(--shadow-md); }
+.elevation-lg { box-shadow: var(--shadow-lg); }
+.elevation-xl { box-shadow: var(--shadow-xl); }
+
+/* Border Utilities */
+.border { border: 1px solid var(--color-border-base); }
+.border-subtle { border: 1px solid var(--color-border-subtle); }
+.border-strong { border: 1px solid var(--color-border-strong); }
+.border-glow { border: 1px solid var(--color-border-glow); }
+
+/* Radius Utilities */
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded { border-radius: var(--radius-base); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* Transition Utilities */
+.transition { transition: var(--transition-base); }
+.transition-fast { transition: var(--transition-fast); }
+.transition-colors { transition: var(--transition-colors); }
+.transition-transform { transition: var(--transition-transform); }
+
+/* ============================================
+   ANIMATIONS & KEYFRAMES
+   ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(0, 212, 255, 0.8);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Animation Classes */
+.animate-fade-in {
+  animation: fadeIn var(--duration-moderate) var(--ease-out);
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale var(--duration-moderate) var(--ease-out);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight var(--duration-moderate) var(--ease-out);
+}
+
+.animate-pulse {
+  animation: pulse var(--duration-slower) var(--ease-in-out) infinite;
+}
+
+.animate-spin {
+  animation: spin var(--duration-slowest) var(--ease-linear) infinite;
+}
+
+.animate-glow {
+  animation: glow var(--duration-slower) var(--ease-in-out) infinite;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Mobile First Approach */
+/* Default styles for mobile (< 640px) */
+
+/* Tablet (≥ 640px) */
+@media (min-width: 640px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Laptop (≥ 1024px) */
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Desktop (≥ 1280px) */
+@media (min-width: 1280px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Large Desktop (≥ 1536px) */
+@media (min-width: 1536px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Focus Styles */
+:focus {
+  outline: 2px solid var(--color-cyan-500);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-cyan-500);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Screen Reader Only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
