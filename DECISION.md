@@ -307,10 +307,10 @@ Esta decisão foi baseada em:
 
 ### Semana 1: Foundation
 - [x] Formalizar decisão estratégica (este documento)
-- [ ] Criar README.md atrativo com screenshots
+- [x] Criar README.md atrativo com screenshots
 - [ ] Gravar demo 5min (Loom/YouTube)
-- [ ] Criar GETTING_STARTED.md detalhado
-- [ ] 4 scripts de exemplo em `examples/`
+- [x] Criar GETTING_STARTED.md detalhado
+- [x] 4 scripts de exemplo em `examples/`
 
 ### Semana 2: Validation
 - [ ] Falar com 10 pesquisadores HIV
@@ -441,13 +441,13 @@ Esta decisão foi baseada em:
 
 **HOJE**:
 - [x] Finalizar e publicar este documento de decisão
-- [ ] Comunicar decisão para stakeholders
-- [ ] Iniciar Semana 1 do plano de 30 dias
+- [x] Comunicar decisão para stakeholders
+- [x] Iniciar Semana 1 do plano de 30 dias
 
 **ESTA SEMANA**:
 - [ ] Gravar vídeo demo 5min
-- [ ] Atualizar README com valor claro
-- [ ] Criar primeiros exemplos funcionais
+- [x] Atualizar README com valor claro
+- [x] Criar primeiros exemplos funcionais
 - [ ] Começar outreach para validação
 
 **ESTE MÊS**:
