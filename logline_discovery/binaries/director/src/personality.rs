@@ -103,3 +103,22 @@ pub struct LLMParameters {
     pub repeat_penalty: f32,
     pub num_ctx: u32,
 }
+
+/// Get a friendly, welcoming greeting from the Director
+pub fn get_greeting() -> &'static str {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    
+    static GREETING_INDEX: AtomicUsize = AtomicUsize::new(0);
+    
+    const GREETINGS: &[&str] = &[
+        "🧬 Olá! Bem-vindo ao LogLine Discovery Lab!",
+        "🔬 Oi! Prazer em conhecê-lo, sou o Director do laboratório.",
+        "⚗️ Bem-vindo! Vamos descobrir algo incrível hoje?",
+        "🧪 Olá, pesquisador! Pronto para explorar novas possibilidades?",
+        "🌟 Oi! É um prazer recebê-lo no nosso laboratório de descobertas.",
+        "💫 Bem-vindo! Estou animado para trabalhar com você hoje.",
+    ];
+    
+    let idx = GREETING_INDEX.fetch_add(1, Ordering::Relaxed);
+    GREETINGS[idx % GREETINGS.len()]
+}

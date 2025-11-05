@@ -3,27 +3,44 @@
 ### Acelere descoberta de medicamentos HIV em 10x com IA conversacional
 
 [![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)](https://www.rust-lang.org)
+[![Next.js](https://img.shields.io/badge/next.js-16.0-black.svg)](https://nextjs.org)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.0.0--partial-green.svg)](releases/)
+[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](releases/)
+[![Integration](https://img.shields.io/badge/integration-complete-success.svg)](INTEGRATION_GUIDE.md)
 
 > **De semanas para horas**: Da proteína ao manuscrito científico automaticamente.  
-> Único agente IA conversacional em português brasileiro para drug discovery.
+> Único laboratório computacional integrado em português brasileiro para drug discovery.
+
+---
+
+## 🎉 **NOVO**: Frontend & Backend Integrados!
+
+O LogLine Discovery Lab agora possui uma **interface cinematográfica completa** integrada com o backend de simulação científica.
+
+- ✅ **Visualização 3D** de proteínas em tempo real
+- ✅ **Métricas científicas** com gráficos interativos  
+- ✅ **Evidências assinadas** criptograficamente
+- ✅ **Audit trail** completo de cada experimento
+
+**[📖 Ver Guia de Integração →](INTEGRATION_GUIDE.md)**
 
 ---
 
 ## ⚡ Demo em 60 Segundos
 
 ```bash
-# 1. Clone e setup
+# 1. Clone o repositório
 git clone https://github.com/danvoulez/lablab.git && cd lablab
-./demo.sh
 
-# 2. Pergunte ao agente
-./target/release/director --mode cli
-> Como funciona a proteína gp41 do HIV?
+# 2. Inicie o backend (Terminal 1)
+cd logline_discovery && cargo run --bin director
+# → http://localhost:3001
 
-# 3. Veja o resultado
-✅ Análise completa com métricas científicas validadas
+# 3. Inicie o frontend (Terminal 2)
+cd protein-cinema-chatgpt && npm run dev
+# → http://localhost:3000
+
+# 4. Abra o navegador e simule uma proteína!
 ```
 
 **[📹 Assista ao vídeo demo completo →](https://youtube.com/...)** *(em breve)*
@@ -34,17 +51,26 @@ git clone https://github.com/danvoulez/lablab.git && cd lablab
 
 **O Problema**: Descobrir medicamentos para HIV leva 10+ anos e custa $2.6B.
 
-**Nossa Solução**: Plataforma open source que acelera descoberta em 10x através de:
+**Nossa Solução**: Plataforma open source **integrada** que acelera descoberta em 10x através de:
 - 🤖 IA conversacional que entende português
 - 🧬 Análise automatizada de proteínas HIV
+- 🎨 Interface cinematográfica para visualização 3D
 - 📊 Pipeline completo: da proteína ao paper científico
 - 🔓 100% transparente e auditável (open source)
+- 🔐 Evidências criptograficamente assinadas
 
-**Diferencial**: Primeiro laboratório computacional com agente IA em português brasileiro, focado em HIV.
+**Diferencial**: Primeiro laboratório computacional com frontend/backend integrados, agente IA em português brasileiro, focado em HIV.
 
 ---
 
 ## ✨ Features Principais
+
+### 🎨 **Interface Cinematográfica (NOVO!)**
+Visualize e interaja com simulações de proteínas:
+- **Protein Theater**: Rotação 3D com 3Dmol.js
+- **Analysis Dashboard**: Gráficos de confiança pLDDT
+- **Session Replay**: Timeline auditável de cada simulação
+- **Scientific Manifesto**: Documentos assinados digitalmente
 
 ### 🤖 Agente Conversacional (Director)
 Converse naturalmente sobre HIV drug discovery:

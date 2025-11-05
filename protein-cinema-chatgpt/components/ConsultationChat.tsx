@@ -3,16 +3,15 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { SessionData, Message } from '../lib/types'
-import { niceId, samplePLDDT, signManifesto, sha256Base64 } from '../lib/manifest'
 import { sanitizeMarkdown, sanitizeUserInput } from '../lib/sanitize'
 import { generateUUID } from '../lib/crypto-utils'
-import { SIMULATION_DELAY_MS } from '../lib/constants'
+import { simulateProtein, ApiError } from '../lib/apiClient'
 
 const INITIAL_MESSAGE: Message = {
   id: 'm0',
   type: 'assistant',
   content:
-    'Bem-vindo ao laboratório. Envie uma sequência FASTA ou descreva sua hipótese (ex: "simular mutação G12D").',
+    '🧬 Bem-vindo ao LogLine Discovery Lab! Sou o Director, seu assistente científico. Envie uma sequência FASTA ou descreva sua hipótese (ex: "simular mutação G12D").',
   timestamp: new Date().toISOString()
 }
 
@@ -68,91 +67,51 @@ export function ConsultationChat({
     setInput('')
     onThinkingState(true)
 
-    // "Simulação" fake com dados plausíveis
-    const sessionId = niceId()
-    const startedAt = new Date().toISOString()
-    const plddt = samplePLDDT(120)
-
-    // Gerar PDB mínimo (1CRN pequeno) – suficiente para visualizar no 3Dmol
-    const pdb = `ATOM      1  N   THR A   1      26.017  24.447   2.842  1.00 50.00           N
-ATOM      2  CA  THR A   1      25.948  23.027   2.451  1.00 50.00           C
-ATOM      3  C   THR A   1      24.505  22.574   2.106  1.00 50.00           C
-ATOM      4  O   THR A   1      24.226  21.375   2.118  1.00 50.00           O
-ATOM      5  N   THR A   2      23.615  23.504   1.771  1.00 50.00           N
-ATOM      6  CA  THR A   2      22.211  23.185   1.444  1.00 50.00           C
-ATOM      7  C   THR A   2      21.327  23.229   2.697  1.00 50.00           C
-ATOM      8  O   THR A   2      21.767  23.650   3.774  1.00 50.00           O
-ATOM      9  N   CYS A   3      20.079  22.806   2.546  1.00 50.00           N
-ATOM     10  CA  CYS A   3      19.123  22.788   3.657  1.00 50.00           C
-ATOM     11  C   CYS A   3      17.670  22.896   3.185  1.00 50.00           C
-ATOM     12  O   CYS A   3      17.396  22.852   1.985  1.00 50.00           O
-TER`
-
-    // Hash dos principais outputs
-    const structureHash = await sha256Base64(pdb + JSON.stringify(plddt))
-    const auditTrail = [
-      'Sessão iniciada',
-      'Entrada validada',
-      'Predição estrutural (mock)',
-      'Cálculo pLDDT',
-      'Geração de manifesto'
-    ]
-
-    const baseSession: SessionData = {
-      sessionId,
-      startedAt,
-      inputSequence: trimmed.startsWith('>') ? trimmed : undefined,
-      structureHash,
-      confidence: { overall: Math.round(plddt.reduce((a, b) => a + b, 0) / plddt.length) },
-      plddt,
-      auditTrail,
-      models: [{ name: 'Model-1', format: 'pdb', content: pdb }]
-    }
-
-    // Assinatura inicial do "manifesto"
-    const manifestoPayload = {
-      sessionId,
-      timestamp: startedAt,
-      scientificQuestion:
-        'Investigação da relação estrutura-função por predição computacional (demo)',
-      methodology: [
-        'Predição mock estilo AlphaFold',
-        'Perfil pLDDT por resíduo',
-        'Hash de artefatos & trilha de auditoria'
-      ],
-      conclusions: [
-        'Pipeline executado com integridade computável',
-        'Artefatos hashados e prontos para reprodutibilidade'
-      ],
-      findings: [{ title: 'Modelo 3D', description: 'Estrutura PDB gerada (demo)', evidence: structureHash }]
-    }
-    const signature = await signManifesto(manifestoPayload)
-
-    const session: SessionData = {
-      ...baseSession,
-      manifesto: {
-        ...manifestoPayload,
-        participants: ['Usuário Pesquisador', 'LogLine Bio (Assistente)'],
-        digitalSignature: signature,
-        auditTrail
-      }
-    }
-
-    // Simula tempo de computação com "cinema thinking"
-    setTimeout(() => {
+    try {
+      // Call backend API to simulate protein
+      const session = await simulateProtein(trimmed)
+      
+      // Update session with real backend data
+      onSessionUpdate(session)
+      
+      // Add success message
       setMessages((m) => [
         ...m,
         {
           id: generateUUID(),
           type: 'assistant',
-          content:
-            'Simulação concluída. Ative as abas **Análise**, **Replay** ou **Manifesto** para explorar os resultados.',
+          content: `✅ Simulação concluída com sucesso! **Session ID**: ${session.sessionId}\n\n` +
+                   `📊 Confiança média: **${session.confidence?.overall.toFixed(1)}%**\n\n` +
+                   `Ative as abas **Análise**, **Replay** ou **Manifesto** para explorar os resultados em detalhes.`,
           timestamp: new Date().toISOString()
         }
       ])
-      onSessionUpdate(session)
+    } catch (error) {
+      // Handle errors gracefully
+      let errorMessage = 'Erro ao processar simulação.'
+      
+      if (error instanceof ApiError) {
+        if (error.status === 503) {
+          errorMessage = '⚠️ O backend não está disponível. Certifique-se de que o Director está rodando.'
+        } else {
+          errorMessage = `❌ Erro na API: ${error.message}`
+        }
+      } else if (error instanceof Error) {
+        errorMessage = `❌ Erro: ${error.message}`
+      }
+      
+      setMessages((m) => [
+        ...m,
+        {
+          id: generateUUID(),
+          type: 'assistant',
+          content: errorMessage,
+          timestamp: new Date().toISOString()
+        }
+      ])
+    } finally {
       onThinkingState(false)
-    }, SIMULATION_DELAY_MS)
+    }
   }
 
   return (
