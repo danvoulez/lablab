@@ -7,8 +7,39 @@
 
 import type { SessionData, ManifestoData } from './types'
 
-// Get API base URL from environment or default to localhost
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+// Get API base URL from environment
+// In production, this MUST be set via NEXT_PUBLIC_API_BASE_URL
+const API_BASE_URL = typeof window !== 'undefined' 
+  ? (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001')
+  : (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001')
+
+// Log warning if using default in production
+if (typeof window !== 'undefined' && 
+    process.env.NODE_ENV === 'production' && 
+    !process.env.NEXT_PUBLIC_API_BASE_URL) {
+  console.warn('⚠️  NEXT_PUBLIC_API_BASE_URL not set in production! Using default.')
+}
+
+/**
+ * Default timeout for API requests (milliseconds)
+ */
+const DEFAULT_TIMEOUT_MS = 30000 // 30 seconds
+
+/**
+ * Create AbortController with timeout
+ */
+function createTimeoutController(timeoutMs: number = DEFAULT_TIMEOUT_MS): {
+  signal: AbortSignal
+  cleanup: () => void
+} {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+  
+  return {
+    signal: controller.signal,
+    cleanup: () => clearTimeout(timeoutId)
+  }
+}
 
 /**
  * Backend response types matching Rust structs
@@ -119,6 +150,8 @@ export async function simulateProtein(
   sequence: string,
   mutation?: string
 ): Promise<SessionData> {
+  const { signal, cleanup } = createTimeoutController()
+  
   try {
     const response = await fetch(`${API_BASE_URL}/api/simulate_protein`, {
       method: 'POST',
@@ -129,6 +162,7 @@ export async function simulateProtein(
         sequence,
         mutation,
       } as SimulateProteinRequest),
+      signal,
     })
 
     if (!response.ok) {
@@ -146,11 +180,20 @@ export async function simulateProtein(
     if (error instanceof ApiError) {
       throw error
     }
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new ApiError(
+        'Request timeout: The simulation is taking too long',
+        408,
+        error
+      )
+    }
     throw new ApiError(
       `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,
       undefined,
       error
     )
+  } finally {
+    cleanup()
   }
 }
 
@@ -161,6 +204,8 @@ export async function sendChatMessage(
   message: string,
   includeContext: boolean = true
 ): Promise<ChatResponse> {
+  const { signal, cleanup } = createTimeoutController()
+  
   try {
     const response = await fetch(`${API_BASE_URL}/api/chat`, {
       method: 'POST',
@@ -171,6 +216,7 @@ export async function sendChatMessage(
         message,
         include_context: includeContext,
       } as ChatRequest),
+      signal,
     })
 
     if (!response.ok) {
@@ -188,11 +234,20 @@ export async function sendChatMessage(
     if (error instanceof ApiError) {
       throw error
     }
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new ApiError(
+        'Request timeout: Chat response is taking too long',
+        408,
+        error
+      )
+    }
     throw new ApiError(
       `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,
       undefined,
       error
     )
+  } finally {
+    cleanup()
   }
 }
 

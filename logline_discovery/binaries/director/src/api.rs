@@ -400,11 +400,14 @@ async fn simulate_protein_handler(
     
     info!("🧬 API simulate_protein request for sequence (len={})", request.sequence.len());
     
-    let session_id = format!("sess_{}", Uuid::new_v4().to_string().split('-').next().unwrap());
+    let session_id = format!("sess_{}", Uuid::new_v4().simple());
     let started_at = Utc::now().to_rfc3339();
     
+    // Minimum sequence length for validation
+    const MIN_SEQUENCE_LENGTH: usize = 10;
+    
     // Generate sample pLDDT values (in production, this would come from real folding engine)
-    let sequence_len = request.sequence.chars().filter(|c| c.is_alphabetic()).count().max(10);
+    let sequence_len = request.sequence.chars().filter(|c| c.is_alphabetic()).count().max(MIN_SEQUENCE_LENGTH);
     let plddt: Vec<f64> = (0..sequence_len)
         .map(|i| {
             // Simulate realistic pLDDT: higher in middle, lower at terminals
