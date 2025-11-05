@@ -1,10 +1,21 @@
 // components/ManifestoView.tsx
 'use client'
 
-import type { SessionData, ManifestoData } from '../lib/types'
+import type { SessionData } from '../lib/types'
 
 export function ManifestoView({ data }: { data: SessionData | null }) {
-  const manifesto: ManifestoData = data?.manifesto || generateDefaultManifesto(data)
+  if (!data?.manifesto) {
+    return (
+      <div className="h-full flex items-center justify-center text-gray-300">
+        <div className="text-center space-y-2">
+          <div className="text-4xl">📝</div>
+          <div>Execute uma simulação para gerar o manifesto científico.</div>
+        </div>
+      </div>
+    )
+  }
+
+  const manifesto = data.manifesto
 
   return (
     <div className="h-full overflow-y-auto p-6 bg-gradient-to-br from-gray-900 to-black">
@@ -92,35 +103,4 @@ export function ManifestoView({ data }: { data: SessionData | null }) {
       </div>
     </div>
   )
-}
-
-function generateDefaultManifesto(data: SessionData | null): ManifestoData {
-  return {
-    sessionId: Date.now().toString(),
-    timestamp: new Date().toISOString(),
-    participants: ['Usuário Pesquisador', 'LogLine Bio (Assistente)'],
-    scientificQuestion: "Investigação da relação estrutura-função através de predição computacional de proteínas",
-    methodology: [
-      "Predição de estrutura terciária usando AlphaFold 2.3.2",
-      "Análise de confiança pLDDT por resíduo", 
-      "Validação de sequência proteica",
-      "Simulação de impacto estrutural de variações",
-      "Documentação auditável em tempo real"
-    ],
-    findings: [
-      {
-        title: "Estrutura Terciária Predita",
-        description: "Modelo 3D gerado com confiança geral de " + (data?.confidence?.overall || 'N/A') + "%",
-        evidence: data?.structureHash || "Hash de estrutura pendente"
-      }
-    ],
-    conclusions: [
-      "O processo de predição foi executado com sucesso e integridade",
-      "Todos os dados de entrada e saída foram hashados e registrados",
-      "Os resultados estão prontos para análise científica adicional",
-      "Este manifesto serve como evidência reprodutível do processo"
-    ],
-    digitalSignature: `SIGNED|${Date.now()}|${btoa('proteintrace_evidence_v1')}|...`,
-    auditTrail: ['Sessão iniciada', 'Validação de sequência', 'Predição AlphaFold', 'Análise de confiança']
-  }
 }
